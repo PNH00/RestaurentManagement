@@ -31,6 +31,19 @@ public class Type {
         this.type = type;
     }
 
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+    }
+
+    public Type(UUID id, String type, Menu menu) {
+        this.id = id;
+        this.type = type;
+        this.menu = menu;
+    }
 
     public Type(UUID id, String type) {
         this.id = id;
@@ -45,6 +58,7 @@ public class Type {
         return "Type{" +
                 "id=" + id +
                 ", type='" + type + '\'' +
+                ", menu=" + menu +
                 '}';
     }
 }
