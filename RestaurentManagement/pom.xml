@@ -25,7 +25,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
@@ -43,7 +42,6 @@
 			<scope>provided</scope>
 		</dependency>
     </dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -52,5 +50,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
