@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,8 +47,14 @@ public class MenuController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMenu(@PathVariable UUID id) {
-        menuService.deleteMenu(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteMenu(@PathVariable UUID id) {
+        try {
+            menuService.deleteMenu(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.valueOf(e.getStatusCode().value()));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
