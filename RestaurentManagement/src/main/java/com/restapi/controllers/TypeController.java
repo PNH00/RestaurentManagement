@@ -33,33 +33,24 @@ public class TypeController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getTypeById(@PathVariable UUID id) {
         Optional<Type> type = typeService.getTypeById(id);
-        return type.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return type.isPresent() ?
+                new ResponseEntity<>(type.get(),HttpStatus.OK):
+                new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    public ResponseEntity<Type> createType(@RequestBody Type type) {
-        Type createdType = typeService.createType(type);
-        return new ResponseEntity<>(createdType, HttpStatus.CREATED);
+    public Type createType(@RequestBody Type type) {
+        return typeService.createType(type);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateType(@PathVariable UUID id, @RequestBody Type type) {
-        try {
-            Type updatedType = typeService.updateType(id, type);
-            return new ResponseEntity<>(updatedType, HttpStatus.OK);
-        } catch (RMValidateException e) {
-            ErrorDetail errorDetail = e.getErrorDetail();
-            return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
-        }
+        return new ResponseEntity<>(typeService.updateType(id,type),HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ErrorDetail> deleteType(@PathVariable UUID id) {
-        try {
-            typeService.deleteType(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RMValidateException e) {
-            return new ResponseEntity<>(e.getErrorDetail(), HttpStatus.valueOf(e.getErrorDetail().getCode()));
-        }
+    public ResponseEntity<?> deleteType(@PathVariable UUID id) {
+        typeService.deleteType(id);
+        return new ResponseEntity<>("Delete success!", HttpStatus.OK);
     }
 }

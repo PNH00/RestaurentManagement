@@ -1,15 +1,13 @@
 package com.restapi.service;
 
 import com.restapi.exceptions.ErrorDetail;
-import com.restapi.exceptions.ErrorDetailHandler;
-import com.restapi.exceptions.GlobalExceptionHandler;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Type;
 import com.restapi.repositories.TypeRepository;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.Date;
 import java.util.List;
@@ -31,6 +29,12 @@ public class TypeService {
     }
 
     public Optional<Type> getTypeById(UUID id) {
+        if (!typeRepository.existsById(id))
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    "Please check the id!" ));
         return typeRepository.findById(id);
     }
 
@@ -43,14 +47,30 @@ public class TypeService {
             type.setId(id);
             return typeRepository.save(type);
         }
-        throw new RMValidateException(new ErrorDetail(new Date().toString(),"Not found", HttpStatus.NOT_FOUND.value(),"Please check the id!" ));
+        throw new RMValidateException(new ErrorDetail(
+                new Date().toString(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                HttpStatus.NOT_FOUND.value(),
+                "Please check the id!" ));
     }
 
-    public void deleteType(UUID id) {
-        if (!typeRepository.existsById(id)) {
-
-            throw new RMValidateException(new ErrorDetail(new Date().toString(),"Not found", HttpStatus.NOT_FOUND.value(),"Please check the id!" ));
+    public void deleteType(UUID id){
+        if (!typeRepository.existsById(id))
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    "Please check the id!" ));
+        try {
+            typeRepository.deleteById(id);
+        }catch (Exception e){
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "Cannot delete this type because this type exists in a menu. " +
+                            "If you want to delete this type, " +
+                            "please delete a menu contain this type first!" ));
         }
-        typeRepository.deleteById(id);
     }
 }

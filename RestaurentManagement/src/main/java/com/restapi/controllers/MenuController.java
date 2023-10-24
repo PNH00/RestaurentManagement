@@ -1,14 +1,11 @@
 package com.restapi.controllers;
 
-import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Menu;
 import com.restapi.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,22 +35,19 @@ public class MenuController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getMenuById(@PathVariable UUID id) {
         Optional<Menu> menu = menuService.getMenuById(id);
-        return menu.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return menu.isPresent() ?
+                new ResponseEntity<>(menu.get(),HttpStatus.OK):
+                new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateMenu(@PathVariable UUID id, @RequestBody Menu menu) {
-        Menu updatedMenu = menuService.updateMenu(id, menu);
-        return new ResponseEntity<>(updatedMenu, HttpStatus.OK);
+        return new  ResponseEntity<>(menuService.updateMenu(id, menu),HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMenu(@PathVariable UUID id) {
-        try {
-            menuService.deleteMenu(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RMValidateException e) {
-            return new ResponseEntity<>(e.getErrorDetail(), HttpStatus.valueOf(e.getErrorDetail().getCode()));
-        }
+        menuService.deleteMenu(id);
+        return new ResponseEntity<>("Delete success!", HttpStatus.OK);
     }
 }
