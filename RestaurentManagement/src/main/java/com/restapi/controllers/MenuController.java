@@ -1,7 +1,5 @@
 package com.restapi.controllers;
 
-import com.restapi.exceptions.ErrorDetail;
-import com.restapi.exceptions.ResourceException;
 import com.restapi.models.Menu;
 import com.restapi.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,35 +34,19 @@ public class MenuController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getMenuById(@PathVariable UUID id) {
-        try {
-            Optional<Menu> menuOptional = menuService.getMenuById(id);
-            Menu menu = menuOptional.orElseThrow(() -> new ResourceException(menuService.createNotFoundErrorDetail(id)));
-            return new ResponseEntity<>(menu, HttpStatus.OK);
-        } catch (ResourceException e) {
-            ErrorDetail errorDetail = e.getErrorDetail();
-            return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
-        }
+        Optional<Menu> menu = menuService.getMenuById(id);
+        return menu.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateMenu(@PathVariable UUID id, @RequestBody Menu menu) {
-        try {
-            Menu updatedMenu = menuService.updateMenu(id, menu);
-            return new ResponseEntity<>(updatedMenu, HttpStatus.OK);
-        } catch (ResourceException e) {
-            ErrorDetail errorDetail = e.getErrorDetail();
-            return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
-        }
+        Menu updatedMenu = menuService.updateMenu(id, menu);
+        return new ResponseEntity<>(updatedMenu, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ErrorDetail> deleteMenu(@PathVariable UUID id) {
-        try {
-            menuService.deleteMenu(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (ResourceException e) {
-            ErrorDetail errorDetail = e.getErrorDetail();
-            return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
-        }
+    public ResponseEntity<Void> deleteMenu(@PathVariable UUID id) {
+        menuService.deleteMenu(id);
+        return ResponseEntity.noContent().build();
     }
 }

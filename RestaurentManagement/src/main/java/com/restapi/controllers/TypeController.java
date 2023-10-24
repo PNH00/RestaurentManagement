@@ -33,7 +33,7 @@ public class TypeController {
     public ResponseEntity<?> getTypeById(@PathVariable UUID id) {
         try {
             Optional<Type> typeOptional = typeService.getTypeById(id);
-            Type type = typeOptional.orElseThrow(() -> new ResourceException(typeService.createNotFoundErrorDetail(id)));
+            Type type = typeOptional.orElseThrow(() -> new ResourceException(typeService.getErrorDetailHandler().createNotFoundErrorDetail(id)));
             return new ResponseEntity<>(type, HttpStatus.OK);
         } catch (ResourceException e) {
             ErrorDetail errorDetail = e.getErrorDetail();

@@ -1,14 +1,18 @@
 package com.restapi.service;
 
 import com.restapi.exceptions.ErrorDetail;
+import com.restapi.exceptions.ErrorDetailHandler;
 import com.restapi.exceptions.ResourceException;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
 import com.restapi.repositories.TypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 
 @Service
@@ -16,35 +20,16 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final TypeRepository typeRepository;
+    private final ErrorDetailHandler errorDetailHandler = new ErrorDetailHandler();
     @Autowired
     public MenuService(MenuRepository menuRepository, TypeRepository typeRepository) {
         this.menuRepository = menuRepository;
         this.typeRepository = typeRepository;
     }
 
-    public ErrorDetail createNotFoundErrorDetail(UUID id) {
-        ErrorDetail errorDetail = new ErrorDetail();
-        errorDetail.setTimestamp(new Date().toString());
-        errorDetail.setStatus("Not found");
-        errorDetail.setCode(HttpStatus.NOT_FOUND.value());
-        errorDetail.setMessage("Check your id '" + id + "' and try again");
-        errorDetail.setData(null);
-        return errorDetail;
-    }
-
-    public ErrorDetail createNotFoundErrorDetail(String message, Menu menu) {
-        ErrorDetail errorDetail = new ErrorDetail();
-        errorDetail.setTimestamp(new Date().toString());
-        errorDetail.setStatus("Bad Request");
-        errorDetail.setCode(HttpStatus.BAD_REQUEST.value());
-        errorDetail.setMessage(message);
-        errorDetail.setData(menu);
-        return errorDetail;
-    }
-
     public Menu createMenu(Menu menu) {
         if (menu.getType().isEmpty()) {
-            ErrorDetail errorDetail = createNotFoundErrorDetail("Cannot create!",menu);
+            ErrorDetail errorDetail = errorDetailHandler.createNotFoundErrorDetail("Cannot create!",menu);
             throw new ResourceException(errorDetail);
         }
         List<Type> types = menu.getType();
@@ -66,21 +51,13 @@ public class MenuService {
     }
 
     public Optional<Menu> getMenuById(UUID id){
-        if (!menuRepository.existsById(id)) {
-            ErrorDetail errorDetail = createNotFoundErrorDetail(id);
-            throw new ResourceException(errorDetail);
-        }
         return menuRepository.findById(id);
     }
 
     public Menu updateMenu(UUID id, Menu menu) {
-        if (!menuRepository.existsById(id)) {
-            ErrorDetail errorDetail = createNotFoundErrorDetail(id);
-            throw new ResourceException(errorDetail);
-        }
         if (menuRepository.existsById(id)) {
             if (menu.getType().isEmpty()) {
-                ErrorDetail errorDetail = createNotFoundErrorDetail("Cannot update!",menu);
+                ErrorDetail errorDetail = errorDetailHandler.createNotFoundErrorDetail("Cannot update!",menu);
                 throw new ResourceException(errorDetail);
             }
             menu.setId(id);
@@ -91,10 +68,17 @@ public class MenuService {
     }
 
     public void deleteMenu(UUID id) {
-        if (!menuRepository.existsById(id)) {
-            ErrorDetail errorDetail = createNotFoundErrorDetail(id);
-            throw new ResourceException(errorDetail);
+        try {
+            if (!menuRepository.existsById(id)) {
+                throw new EmptyResultDataAccessException(1);
+            }
+            menuRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu not found with id: " + id);
+        } catch (DataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error occurred");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error occurred");
         }
-        menuRepository.deleteById(id);
     }
 }
