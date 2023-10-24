@@ -1,14 +1,17 @@
 package com.restapi.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "menus")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Menu {
 
     @Id
@@ -24,16 +27,4 @@ public class Menu {
     private double price;
     @OneToMany
     private List<Type> type;
-
-    public Menu(UUID id, String name, String description, String image, double price, List<Type> type) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.image = image;
-        this.price = price;
-        this.type = type;
-    }
-
-    public Menu() {
-    }
 }
