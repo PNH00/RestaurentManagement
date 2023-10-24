@@ -3,6 +3,7 @@ package com.restapi.controllers;
 import com.restapi.models.Menu;
 import com.restapi.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,16 @@ public class MenuController {
     public ResponseEntity<List<Menu>> getAllMenus() {
         List<Menu> menus = menuService.getAllMenus();
         return new ResponseEntity<>(menus, HttpStatus.OK);
+    }
+
+    @GetMapping("/pagination")
+    public ResponseEntity<List<Menu>> getAllMenusPaged(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "id") String sortBy)
+    {
+        List<Menu> list = menuService.getAllMenusPaged(pageNo, pageSize, sortBy);
+        return new ResponseEntity<>(list,new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

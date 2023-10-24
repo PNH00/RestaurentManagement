@@ -7,6 +7,10 @@ import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
 import com.restapi.repositories.TypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -43,6 +47,15 @@ public class MenuService {
         }
         menu.setType(existingTypes);
         return menuRepository.save(menu);
+    }
+
+    public List<Menu> getAllMenusPaged(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
+        Page<Menu> pagedResult = menuRepository.findAll(pageable);
+        if (pagedResult.hasContent())
+            return pagedResult.getContent();
+        else
+            return new ArrayList<Menu>();
     }
 
     public List<Menu> getAllMenus() {
