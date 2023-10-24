@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,31 +24,25 @@ public class MenuController {
     }
 
     @PostMapping
-    public Menu createMenu(@RequestBody Menu menu) {
+    public Object createMenu(@RequestBody Menu menu) {
         return menuService.createMenu(menu);
     }
 
     @GetMapping
-    public ResponseEntity<List<Menu>> getAllMenus() {
-        List<Menu> menus = menuService.getAllMenus();
-        return new ResponseEntity<>(menus, HttpStatus.OK);
-    }
-
-    @GetMapping("/pagination")
     public ResponseEntity<List<Menu>> getAllMenusPaged(
-            @RequestParam(defaultValue = "0") int pageNo,
-            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy)
     {
-        List<Menu> list = menuService.getAllMenusPaged(pageNo, pageSize, sortBy);
+        List<Menu> list = menuService.getAllMenusPaged(page, size, sortBy);
         return new ResponseEntity<>(list,new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getMenuById(@PathVariable UUID id) {
-        Optional<Menu> menu = menuService.getMenuById(id);
-        return menu.isPresent() ?
-                new ResponseEntity<>(menu.get(),HttpStatus.OK):
+        Object menu = menuService.getMenuById(id);
+        return menu!=null ?
+                new ResponseEntity<>(menu,HttpStatus.OK):
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -58,7 +53,6 @@ public class MenuController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMenu(@PathVariable UUID id) {
-        menuService.deleteMenu(id);
-        return new ResponseEntity<>("Delete success!", HttpStatus.OK);
+        return new ResponseEntity<>(menuService.deleteMenu(id), HttpStatus.OK);
     }
 }
