@@ -1,9 +1,9 @@
 package com.restapi.exceptions;
 
-public class ResourceException extends RuntimeException {
+public class RMValidateException extends RuntimeException {
     private final ErrorDetail errorDetail;
 
-    public ResourceException(ErrorDetail errorDetail) {
+    public RMValidateException(ErrorDetail errorDetail) {
         this.errorDetail = errorDetail;
     }
 

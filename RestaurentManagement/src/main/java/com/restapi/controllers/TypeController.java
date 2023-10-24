@@ -1,7 +1,8 @@
 package com.restapi.controllers;
 
 import com.restapi.exceptions.ErrorDetail;
-import com.restapi.exceptions.ResourceException;
+import com.restapi.exceptions.RMValidateException;
+import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.service.TypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,8 @@ public class TypeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTypeById(@PathVariable UUID id) {
-        try {
-            Optional<Type> typeOptional = typeService.getTypeById(id);
-            Type type = typeOptional.orElseThrow(() -> new ResourceException(typeService.getErrorDetailHandler().createNotFoundErrorDetail(id)));
-            return new ResponseEntity<>(type, HttpStatus.OK);
-        } catch (ResourceException e) {
-            ErrorDetail errorDetail = e.getErrorDetail();
-            return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
-        }
+        Optional<Type> type = typeService.getTypeById(id);
+        return type.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
@@ -52,7 +47,7 @@ public class TypeController {
         try {
             Type updatedType = typeService.updateType(id, type);
             return new ResponseEntity<>(updatedType, HttpStatus.OK);
-        } catch (ResourceException e) {
+        } catch (RMValidateException e) {
             ErrorDetail errorDetail = e.getErrorDetail();
             return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
         }
@@ -63,9 +58,8 @@ public class TypeController {
         try {
             typeService.deleteType(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (ResourceException e) {
-            ErrorDetail errorDetail = e.getErrorDetail();
-            return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
+        } catch (RMValidateException e) {
+            return new ResponseEntity<>(e.getErrorDetail(), HttpStatus.valueOf(e.getErrorDetail().getCode()));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.restapi.controllers;
 
+import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Menu;
 import com.restapi.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +51,9 @@ public class MenuController {
     public ResponseEntity<?> deleteMenu(@PathVariable UUID id) {
         try {
             menuService.deleteMenu(id);
-            return ResponseEntity.noContent().build();
-        } catch (ResponseStatusException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.valueOf(e.getStatusCode().value()));
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RMValidateException e) {
+            return new ResponseEntity<>(e.getErrorDetail(), HttpStatus.valueOf(e.getErrorDetail().getCode()));
         }
     }
 }

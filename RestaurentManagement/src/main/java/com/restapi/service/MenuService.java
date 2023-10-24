@@ -1,8 +1,8 @@
 package com.restapi.service;
 
 import com.restapi.exceptions.ErrorDetail;
-import com.restapi.exceptions.ErrorDetailHandler;
-import com.restapi.exceptions.ResourceException;
+import com.restapi.exceptions.GlobalExceptionHandler;
+import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
@@ -20,7 +20,7 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final TypeRepository typeRepository;
-    private final ErrorDetailHandler errorDetailHandler = new ErrorDetailHandler();
+
     @Autowired
     public MenuService(MenuRepository menuRepository, TypeRepository typeRepository) {
         this.menuRepository = menuRepository;
@@ -29,8 +29,7 @@ public class MenuService {
 
     public Menu createMenu(Menu menu) {
         if (menu.getType().isEmpty()) {
-            ErrorDetail errorDetail = errorDetailHandler.createNotFoundErrorDetail("Cannot create!",menu);
-            throw new ResourceException(errorDetail);
+            throw new RMValidateException(new ErrorDetail(new Date().toString(),"Bad request",HttpStatus.BAD_REQUEST.value(),"Cannot create!" ));
         }
         List<Type> types = menu.getType();
         List<Type> existingTypes = new ArrayList<>();
@@ -57,8 +56,7 @@ public class MenuService {
     public Menu updateMenu(UUID id, Menu menu) {
         if (menuRepository.existsById(id)) {
             if (menu.getType().isEmpty()) {
-                ErrorDetail errorDetail = errorDetailHandler.createNotFoundErrorDetail("Cannot update!",menu);
-                throw new ResourceException(errorDetail);
+                throw new RMValidateException(new ErrorDetail(new Date().toString(),"Bad request",HttpStatus.BAD_REQUEST.value(),"Cannot update!" ));
             }
             menu.setId(id);
             typeRepository.saveAll(menu.getType());
@@ -68,17 +66,9 @@ public class MenuService {
     }
 
     public void deleteMenu(UUID id) {
-        try {
-            if (!menuRepository.existsById(id)) {
-                throw new EmptyResultDataAccessException(1);
-            }
+        if(menuRepository.existsById(id))
             menuRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu not found with id: " + id);
-        } catch (DataAccessException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error occurred");
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error occurred");
-        }
+        else
+            throw new RMValidateException(new ErrorDetail(new Date().toString(),"Not found",HttpStatus.NOT_FOUND.value(),"Please check the id!" ));
     }
 }
