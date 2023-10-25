@@ -52,6 +52,8 @@ public class MenuService {
 
     public List<Menu> getAllMenusPaged(int page, int size, String sortBy) {
         int pageReadjust = RMUtils.setPage(page,size, (int) menuRepository.count());
+        if(size >= 0)
+            size = 10;
         Pageable pageable = PageRequest.of(pageReadjust, size, Sort.by(Sort.Order.desc(sortBy)));
         Page<Menu> pagedResult = menuRepository.findAll(pageable);
         if (pagedResult.hasContent())
