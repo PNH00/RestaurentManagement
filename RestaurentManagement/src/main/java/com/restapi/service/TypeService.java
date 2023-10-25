@@ -30,8 +30,8 @@ public class TypeService {
         if (!typeRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     "Please check the id!" ));
         return typeRepository.findById(id);
     }
@@ -47,8 +47,8 @@ public class TypeService {
         }
         throw new RMValidateException(new ErrorDetail(
                 new Date().toString(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
                 HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
                 "Please check the id!" ));
     }
 
@@ -56,16 +56,16 @@ public class TypeService {
         if (!typeRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     "Please check the id!" ));
         try {
             typeRepository.deleteById(id);
         }catch (Exception e){
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     "Cannot delete this type because this type exists in a menu. " +
                             "If you want to delete this type, " +
                             "please delete a menu contain this type first!" ));

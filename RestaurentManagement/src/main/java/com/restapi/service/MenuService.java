@@ -2,6 +2,7 @@ package com.restapi.service;
 
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
+import com.restapi.exceptions.SuccessDetail;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
@@ -27,12 +28,12 @@ public class MenuService {
         this.typeRepository = typeRepository;
     }
 
-    public Menu createMenu(Menu menu) {
+    public Object createMenu(Menu menu) {
         if (menu.getType().isEmpty()) {
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     "Cannot create!" ));
         }
         List<Type> types = menu.getType();
@@ -46,11 +47,23 @@ public class MenuService {
             }
         }
         menu.setType(existingTypes);
-        return menuRepository.save(menu);
+        return new SuccessDetail(HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Create success!",
+                menuRepository.save(menu));
     }
 
     public List<Menu> getAllMenusPaged(int page, int size, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
+        if (page <=0)
+            page = 1;
+        int totalMenus = (int) menuRepository.count();
+        int totalPages = (int) Math.ceil((double) totalMenus / size);
+        if (page > totalPages) {
+            page = totalPages;
+        }
+        System.out.println(totalMenus);
+        System.out.println(totalPages);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Order.desc(sortBy)));
         Page<Menu> pagedResult = menuRepository.findAll(pageable);
         if (pagedResult.hasContent())
             return pagedResult.getContent();
@@ -58,49 +71,60 @@ public class MenuService {
             return new ArrayList<Menu>();
     }
 
-    public List<Menu> getAllMenus() {
-        return menuRepository.findAll();
-    }
-
-    public Optional<Menu> getMenuById(UUID id){
+    public Object getMenuById(UUID id){
         if (!menuRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     "Please check the id!" ));
-        return menuRepository.findById(id);
+        return new SuccessDetail(HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Get the menu successfully!",
+                menuRepository.findById(id));
     }
 
-    public Menu updateMenu(UUID id, Menu menu) {
+    public Object updateMenu(UUID id, Menu menu) {
         if(!menuRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     "Please check the id!" ));
         else {
             if (menu.getType().isEmpty()) {
                 throw new RMValidateException(new ErrorDetail(
                         new Date().toString(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         "Cannot update!" ));
             }
             menu.setId(id);
             typeRepository.saveAll(menu.getType());
-            return menuRepository.save(menu);
+            return new SuccessDetail(HttpStatus.OK.value(),
+                    HttpStatus.OK.getReasonPhrase(),
+                    "Update success!",
+                    menuRepository.save(menu));
         }
     }
 
-    public void deleteMenu(UUID id) {
-        if(menuRepository.existsById(id))
+    public Object deleteMenu(UUID id) {
+        SuccessDetail successDetail = new SuccessDetail(HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase()
+                ,"Delete success!",
+                null);
+        if(menuRepository.existsById(id)){
+            Menu menu = menuRepository.findById(id).get();
+            successDetail.setData(menu.toString());
             menuRepository.deleteById(id);
-        else
+        }
+        else{
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     "Please check the id!" ));
+        }
+        return successDetail;
     }
 }
