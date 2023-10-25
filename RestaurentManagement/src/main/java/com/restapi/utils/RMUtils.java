@@ -9,6 +9,7 @@ public class RMUtils {
         }
         if (page <=0)
             page = 1;
-        return page - 1;
+        int pageReadjust = page - 1;
+        return pageReadjust;
     }
 }
