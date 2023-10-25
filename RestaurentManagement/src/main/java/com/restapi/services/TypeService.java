@@ -1,11 +1,14 @@
 package com.restapi.services;
 
+import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Type;
 import com.restapi.repositories.TypeRepository;
-import com.restapi.utils.RMUtils;
+import com.restapi.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,7 +29,11 @@ public class TypeService {
 
     public Optional<Type> getTypeById(UUID id) {
         if (!typeRepository.existsById(id))
-            throw new RMValidateException(RMUtils.ERROR_DETAIL_NOT_FOUND);
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    Constants.ERROR_DETAIL_NOT_FOUND));
         return typeRepository.findById(id);
     }
 
@@ -39,16 +46,28 @@ public class TypeService {
             type.setId(id);
             return typeRepository.save(type);
         }
-        throw new RMValidateException(RMUtils.ERROR_DETAIL_NOT_FOUND);
+        throw new RMValidateException(new ErrorDetail(
+                new Date().toString(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                HttpStatus.NOT_FOUND.value(),
+                Constants.ERROR_DETAIL_NOT_FOUND));
     }
 
     public void deleteType(UUID id){
         if (!typeRepository.existsById(id))
-            throw new RMValidateException(RMUtils.ERROR_DETAIL_NOT_FOUND);
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    Constants.ERROR_DETAIL_NOT_FOUND));
         try {
             typeRepository.deleteById(id);
         }catch (Exception e){
-            throw new RMValidateException(RMUtils.ERROR_DETAIL_INTERNAL_SERVER_ERROR);
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    Constants.ERROR_DETAIL_INTERNAL_SERVER_ERROR));
         }
     }
 }

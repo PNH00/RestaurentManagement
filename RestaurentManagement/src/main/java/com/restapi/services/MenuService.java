@@ -1,16 +1,17 @@
 package com.restapi.services;
 
+import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
 import com.restapi.repositories.TypeRepository;
+import com.restapi.utils.Constants;
 import com.restapi.utils.RMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -28,7 +29,11 @@ public class MenuService {
 
     public Menu createMenu(Menu menu) {
         if (menu.getType().isEmpty()) {
-            throw new RMValidateException(RMUtils.ERROR_DETAIL_BAD_REQUEST);
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    Constants.ERROR_DETAIL_BAD_REQUEST));
         }
         List<Type> types = menu.getType();
         List<Type> existingTypes = new ArrayList<>();
@@ -57,16 +62,28 @@ public class MenuService {
 
     public Optional<Menu> getMenuById(UUID id){
         if (!menuRepository.existsById(id))
-            throw new RMValidateException(RMUtils.ERROR_DETAIL_NOT_FOUND);
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    Constants.ERROR_DETAIL_NOT_FOUND));
         return menuRepository.findById(id);
     }
 
     public Menu updateMenu(UUID id, Menu menu) {
         if(!menuRepository.existsById(id))
-            throw new RMValidateException(RMUtils.ERROR_DETAIL_NOT_FOUND);
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    Constants.ERROR_DETAIL_NOT_FOUND));
         else {
             if (menu.getType().isEmpty()) {
-                throw new RMValidateException(RMUtils.ERROR_DETAIL_BAD_REQUEST);
+                throw new RMValidateException(new ErrorDetail(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        Constants.ERROR_DETAIL_BAD_REQUEST));
             }
             menu.setId(id);
             typeRepository.saveAll(menu.getType());
@@ -78,6 +95,10 @@ public class MenuService {
         if(menuRepository.existsById(id))
             menuRepository.deleteById(id);
         else
-            throw new RMValidateException(RMUtils.ERROR_DETAIL_NOT_FOUND);
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    Constants.ERROR_DETAIL_NOT_FOUND));
     }
 }
