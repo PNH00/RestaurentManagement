@@ -31,9 +31,10 @@ public class MenuController {
     public ResponseEntity<List<Menu>> getAllMenusPaged(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy)
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String order)
     {
-        List<Menu> list = menuService.getAllMenusPaged(page, size, sortBy);
+        List<Menu> list = menuService.getAllMenusPaged(page, size, sortBy,order);
         return new ResponseEntity<>(list,new HttpHeaders(), HttpStatus.OK);
     }
 
