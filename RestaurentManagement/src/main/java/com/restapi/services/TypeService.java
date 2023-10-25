@@ -4,7 +4,7 @@ import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Type;
 import com.restapi.repositories.TypeRepository;
-import com.restapi.utils.Constants;
+import com.restapi.constants.RMConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class TypeService {
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
-                    Constants.ERROR_DETAIL_NOT_FOUND));
+                    RMConstant.TYPE_NOT_FOUND));
         return typeRepository.findById(id);
     }
 
@@ -50,7 +50,7 @@ public class TypeService {
                 new Date().toString(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 HttpStatus.NOT_FOUND.value(),
-                Constants.ERROR_DETAIL_NOT_FOUND));
+                RMConstant.TYPE_NOT_FOUND));
     }
 
     public void deleteType(UUID id){
@@ -59,7 +59,7 @@ public class TypeService {
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
-                    Constants.ERROR_DETAIL_NOT_FOUND));
+                    RMConstant.TYPE_NOT_FOUND));
         try {
             typeRepository.deleteById(id);
         }catch (Exception e){
@@ -67,7 +67,7 @@ public class TypeService {
                     new Date().toString(),
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    Constants.ERROR_DETAIL_INTERNAL_SERVER_ERROR));
+                    RMConstant.TYPE_INTERNAL_SERVER_ERROR));
         }
     }
 }

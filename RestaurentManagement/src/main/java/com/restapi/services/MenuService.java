@@ -6,7 +6,7 @@ import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
 import com.restapi.repositories.TypeRepository;
-import com.restapi.utils.Constants;
+import com.restapi.constants.RMConstant;
 import com.restapi.utils.RMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,7 +33,7 @@ public class MenuService {
                     new Date().toString(),
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     HttpStatus.BAD_REQUEST.value(),
-                    Constants.ERROR_DETAIL_BAD_REQUEST));
+                    RMConstant.TYPE_BAD_REQUEST));
         }
         List<Type> types = menu.getType();
         List<Type> existingTypes = new ArrayList<>();
@@ -66,7 +66,7 @@ public class MenuService {
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
-                    Constants.ERROR_DETAIL_NOT_FOUND));
+                    RMConstant.MENU_NOT_FOUND));
         return menuRepository.findById(id);
     }
 
@@ -76,14 +76,14 @@ public class MenuService {
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
-                    Constants.ERROR_DETAIL_NOT_FOUND));
+                    RMConstant.MENU_NOT_FOUND));
         else {
             if (menu.getType().isEmpty()) {
                 throw new RMValidateException(new ErrorDetail(
                         new Date().toString(),
                         HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         HttpStatus.BAD_REQUEST.value(),
-                        Constants.ERROR_DETAIL_BAD_REQUEST));
+                        RMConstant.MENU_BAD_REQUEST));
             }
             menu.setId(id);
             typeRepository.saveAll(menu.getType());
@@ -99,6 +99,6 @@ public class MenuService {
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
-                    Constants.ERROR_DETAIL_NOT_FOUND));
+                    RMConstant.MENU_NOT_FOUND));
     }
 }
