@@ -1,7 +1,7 @@
 package com.restapi.controllers;
 
 import com.restapi.models.Type;
-import com.restapi.service.TypeService;
+import com.restapi.services.TypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,13 +1,14 @@
 package com.restapi.controllers;
 
 import com.restapi.models.Menu;
-import com.restapi.service.MenuService;
+import com.restapi.services.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,7 +23,7 @@ public class MenuController {
     }
 
     @PostMapping
-    public Object createMenu(@RequestBody Menu menu) {
+    public Menu createMenu(@RequestBody Menu menu) {
         return menuService.createMenu(menu);
     }
 
@@ -38,9 +39,9 @@ public class MenuController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getMenuById(@PathVariable UUID id) {
-        Object menu = menuService.getMenuById(id);
-        return menu!=null ?
-                new ResponseEntity<>(menu,HttpStatus.OK):
+        Optional<Menu> menu = menuService.getMenuById(id);
+        return menu.isPresent() ?
+                new ResponseEntity<>(menu.get(),HttpStatus.OK):
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -51,6 +52,7 @@ public class MenuController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMenu(@PathVariable UUID id) {
-        return new ResponseEntity<>(menuService.deleteMenu(id), HttpStatus.OK);
+        menuService.deleteMenu(id);
+        return new ResponseEntity<>("Delete success!", HttpStatus.OK);
     }
 }
