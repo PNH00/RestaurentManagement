@@ -1,5 +1,6 @@
 package com.restapi.controllers;
 
+import com.restapi.dto.TypeDTO;
 import com.restapi.models.Type;
 import com.restapi.services.TypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,21 +23,20 @@ public class TypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Type>> getAllTypes() {
-        List<Type> types = typeService.getAllTypes();
+    public ResponseEntity<List<TypeDTO>> getAllTypes() {
+        List<TypeDTO> types = typeService.getAllTypes();
         return new ResponseEntity<>(types, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTypeById(@PathVariable UUID id) {
-        Optional<Type> type = typeService.getTypeById(id);
-        return type.isPresent() ?
-                new ResponseEntity<>(type.get(),HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        TypeDTO type = typeService.getTypeById(id);
+        return new ResponseEntity<>(type,HttpStatus.OK);
+
     }
 
     @PostMapping
-    public Type createType(@RequestBody Type type) {
+    public TypeDTO createType(@RequestBody Type type) {
         return typeService.createType(type);
     }
 

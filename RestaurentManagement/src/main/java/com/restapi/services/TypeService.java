@@ -1,17 +1,17 @@
 package com.restapi.services;
 
+import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Type;
 import com.restapi.repositories.TypeRepository;
 import com.restapi.constants.RMConstant;
+import com.restapi.utils.RMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 
 @Service
 public class TypeService {
@@ -23,28 +23,33 @@ public class TypeService {
         this.typeRepository = typeRepository;
     }
 
-    public List<Type> getAllTypes() {
-        return typeRepository.findAll();
+    public List<TypeDTO> getAllTypes() {
+        List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
+        for (Type type: typeRepository.findAll()) {
+            typeDTOs.add(RMUtils.typeMapper(type));
+        }
+        return typeDTOs;
     }
 
-    public Optional<Type> getTypeById(UUID id) {
-        if (!typeRepository.existsById(id))
+    public TypeDTO getTypeById(UUID id) {
+        if (typeRepository.findById(id).isEmpty())
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
-        return typeRepository.findById(id);
+        return RMUtils.typeMapper(typeRepository.findById(id).get());
     }
 
-    public Type createType(Type type) {
-        return typeRepository.save(type);
+    public TypeDTO createType(Type type) {
+        return RMUtils.typeMapper(typeRepository.save(type));
     }
 
-    public Type updateType(UUID id, Type type) {
+    public TypeDTO updateType(UUID id, Type type) {
         if (typeRepository.existsById(id)) {
             type.setId(id);
-            return typeRepository.save(type);
+            Type typeUpdated = typeRepository.save(type);
+            return RMUtils.typeMapper(typeUpdated);
         }
         throw new RMValidateException(new ErrorDetail(
                 new Date().toString(),
