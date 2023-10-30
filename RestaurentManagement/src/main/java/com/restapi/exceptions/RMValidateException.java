@@ -7,8 +7,8 @@ import lombok.Getter;
 public class RMValidateException extends RuntimeException {
     private final ErrorResponse errorResponse;
 
-    public RMValidateException(ErrorResponse errorDetail) {
-        this.errorResponse = errorDetail;
+    public RMValidateException(ErrorResponse errorResponse) {
+        this.errorResponse = errorResponse;
     }
 
 }
