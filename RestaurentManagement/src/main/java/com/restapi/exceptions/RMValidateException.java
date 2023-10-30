@@ -3,13 +3,13 @@ package com.restapi.exceptions;
 import com.restapi.response.ErrorResponse;
 
 public class RMValidateException extends RuntimeException {
-    private final ErrorResponse errorDetail;
+    private final ErrorResponse errorResponse;
 
     public RMValidateException(ErrorResponse errorDetail) {
-        this.errorDetail = errorDetail;
+        this.errorResponse = errorDetail;
     }
 
     public ErrorResponse getErrorDetail() {
-        return errorDetail;
+        return errorResponse;
     }
 }

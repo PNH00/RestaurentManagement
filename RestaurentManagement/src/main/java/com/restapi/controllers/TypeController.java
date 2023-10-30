@@ -22,9 +22,14 @@ public class TypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TypeDTO>> getAllTypes() {
+    public ResponseEntity<SuccessResponse> getAllTypes() {
         List<TypeDTO> types = typeService.getAllTypes();
-        return new ResponseEntity<>(types, HttpStatus.OK);
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Get type successfully!",
+                types);
+        return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

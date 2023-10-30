@@ -11,7 +11,7 @@ public class GlobalExceptionHandler{
 
     @ExceptionHandler(RMValidateException.class)
     public ResponseEntity<ErrorResponse> handleMenuValidationException(RMValidateException ex) {
-        ErrorResponse errorDetail = ex.getErrorDetail();
-        return new ResponseEntity<>(errorDetail, HttpStatus.valueOf(errorDetail.getCode()));
+        ErrorResponse errorResponse = ex.getErrorDetail();
+        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(errorResponse.getCode()));
     }
 }

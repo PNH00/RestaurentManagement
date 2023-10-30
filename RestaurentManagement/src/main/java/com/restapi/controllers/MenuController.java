@@ -33,14 +33,19 @@ public class MenuController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MenuDTO>> getAllMenusPaged(
+    public ResponseEntity<SuccessResponse> getAllMenusPaged(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String order)
     {
         List<MenuDTO> list = menuService.getAllMenusPaged(page, size, sortBy,order);
-        return new ResponseEntity<>(list,new HttpHeaders(), HttpStatus.OK);
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Get menu successfully!",
+                list);
+        return new ResponseEntity<>(successResponse,new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
