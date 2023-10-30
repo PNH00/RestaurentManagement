@@ -1,9 +1,14 @@
 package com.restapi.services;
 
+<<<<<<< HEAD
 import com.restapi.dto.MenuDTO;
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.exceptions.SuccessfulResponse;
+=======
+import com.restapi.exceptions.ErrorDetail;
+import com.restapi.exceptions.RMValidateException;
+>>>>>>> 391ec39174d202c8b9d04559ed7dd8a39d05c4a5
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
@@ -29,12 +34,21 @@ public class MenuService {
         this.typeRepository = typeRepository;
     }
 
+<<<<<<< HEAD
     public SuccessfulResponse createMenu(Menu menu) {
         if (menu.getType().isEmpty()) {
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
                     HttpStatus.BAD_REQUEST.value(),
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
+=======
+    public Menu createMenu(Menu menu) {
+        if (menu.getType().isEmpty()) {
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    HttpStatus.BAD_REQUEST.value(),
+>>>>>>> 391ec39174d202c8b9d04559ed7dd8a39d05c4a5
                     RMConstant.TYPE_BAD_REQUEST));
         }
         List<Type> types = menu.getType();
@@ -48,6 +62,7 @@ public class MenuService {
             }
         }
         menu.setType(existingTypes);
+<<<<<<< HEAD
         try {
             Menu menuCreated = menuRepository.save(menu);
             return new SuccessfulResponse(
@@ -65,10 +80,17 @@ public class MenuService {
     }
 
     public List<MenuDTO> getAllMenusPaged(int page, int size, String sortBy,String order) {
+=======
+        return menuRepository.save(menu);
+    }
+
+    public List<Menu> getAllMenusPaged(int page, int size, String sortBy,String order) {
+>>>>>>> 391ec39174d202c8b9d04559ed7dd8a39d05c4a5
         int trueSize = RMUtils.setSize(size);
         int truePage = RMUtils.setPage(page,trueSize, (int) menuRepository.count());
         Pageable pageable = RMUtils.sortOrder(truePage,trueSize,sortBy,order);
         Page<Menu> pagedResult = menuRepository.findAll(pageable);
+<<<<<<< HEAD
         if (pagedResult.hasContent()){
             List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
             for (Menu menu:pagedResult.getContent()) {
@@ -101,17 +123,47 @@ public class MenuService {
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
+=======
+        if (pagedResult.hasContent())
+            return pagedResult.getContent();
+        else
+            return new ArrayList<Menu>();
+    }
+
+    public Optional<Menu> getMenuById(UUID id){
+        if (!menuRepository.existsById(id))
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+                    RMConstant.MENU_NOT_FOUND));
+        return menuRepository.findById(id);
+    }
+
+    public Menu updateMenu(UUID id, Menu menu) {
+        if(!menuRepository.existsById(id))
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+>>>>>>> 391ec39174d202c8b9d04559ed7dd8a39d05c4a5
                     RMConstant.MENU_NOT_FOUND));
         else {
             if (menu.getType().isEmpty()) {
                 throw new RMValidateException(new ErrorDetail(
                         new Date().toString(),
+<<<<<<< HEAD
                         HttpStatus.BAD_REQUEST.value(),
                         HttpStatus.BAD_REQUEST.getReasonPhrase(),
+=======
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        HttpStatus.BAD_REQUEST.value(),
+>>>>>>> 391ec39174d202c8b9d04559ed7dd8a39d05c4a5
                         RMConstant.MENU_BAD_REQUEST));
             }
             menu.setId(id);
             typeRepository.saveAll(menu.getType());
+<<<<<<< HEAD
             Menu menuUpdated = menuRepository.save(menu);
             return new SuccessfulResponse(
                     HttpStatus.OK.value(),
@@ -136,6 +188,20 @@ public class MenuService {
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
+=======
+            return menuRepository.save(menu);
+        }
+    }
+
+    public void deleteMenu(UUID id) {
+        if(menuRepository.existsById(id))
+            menuRepository.deleteById(id);
+        else
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    HttpStatus.NOT_FOUND.value(),
+>>>>>>> 391ec39174d202c8b9d04559ed7dd8a39d05c4a5
                     RMConstant.MENU_NOT_FOUND));
     }
 }
