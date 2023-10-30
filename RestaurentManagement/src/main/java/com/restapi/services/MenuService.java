@@ -25,7 +25,7 @@ public class MenuService {
     private final TypeService typeService;
 
     @Autowired
-    public MenuService(MenuRepository menuRepository, TypeRepository typeRepository, TypeService typeService) {
+    public MenuService(MenuRepository menuRepository, TypeService typeService) {
         this.menuRepository = menuRepository;
         this.typeService = typeService;
     }
