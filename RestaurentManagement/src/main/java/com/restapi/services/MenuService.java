@@ -1,7 +1,10 @@
 package com.restapi.services;
 
+import com.restapi.dto.MenuDTO;
+import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
+import com.restapi.mapper.MenuMapper;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
@@ -19,75 +22,83 @@ import java.util.*;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final TypeRepository typeRepository;
+    private final TypeService typeService;
 
     @Autowired
-    public MenuService(MenuRepository menuRepository, TypeRepository typeRepository) {
+    public MenuService(MenuRepository menuRepository, TypeService typeService) {
         this.menuRepository = menuRepository;
-        this.typeRepository = typeRepository;
+        this.typeService = typeService;
     }
 
-    public Menu createMenu(Menu menu) {
+    public MenuDTO createMenu(MenuDTO menu) {
         if (menu.getType().isEmpty()) {
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     RMConstant.TYPE_BAD_REQUEST));
         }
-        List<Type> types = menu.getType();
-        List<Type> existingTypes = new ArrayList<>();
-        for (Type type : types) {
-            if (type.getId() != null && typeRepository.existsById(type.getId())) {
-                existingTypes.add(type);
-            } else {
-                Type newType = typeRepository.save(type);
-                existingTypes.add(newType);
-            }
+        List<Type> types = typeService.saveAllType(menu.getType());
+        Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
+        menuToCreate.setType(types);
+        try {
+            menuRepository.save(menuToCreate);
+            return menu;
+        }catch (Exception e){
+            throw new RMValidateException(new ErrorDetail(
+                    new Date().toString(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    RMConstant.INTERNAL_SERVER_ERROR));
         }
-        menu.setType(existingTypes);
-        return menuRepository.save(menu);
     }
 
-    public List<Menu> getAllMenusPaged(int page, int size, String sortBy,String order) {
+    public List<MenuDTO> getAllMenusPaged(int page, int size, String sortBy,String order) {
         int trueSize = RMUtils.setSize(size);
         int truePage = RMUtils.setPage(page,trueSize, (int) menuRepository.count());
         Pageable pageable = RMUtils.sortOrder(truePage,trueSize,sortBy,order);
         Page<Menu> pagedResult = menuRepository.findAll(pageable);
-        if (pagedResult.hasContent())
-            return pagedResult.getContent();
+        if (pagedResult.hasContent()){
+            List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
+            for (Menu menu : pagedResult.getContent())  {
+                menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
+            }
+            return menuDTOs;
+        }
         else
-            return new ArrayList<Menu>();
+            return new ArrayList<MenuDTO>();
     }
 
-    public Optional<Menu> getMenuById(UUID id){
-        if (!menuRepository.existsById(id))
+    public MenuDTO getMenuById(UUID id){
+        if (menuRepository.findById(id).isEmpty())
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
-        return menuRepository.findById(id);
+        return MenuMapper.menuToMenuDTOMapper(menuRepository.findById(id).get());
     }
 
-    public Menu updateMenu(UUID id, Menu menu) {
+    public MenuDTO updateMenu(UUID id, MenuDTO menu) {
         if(!menuRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         else {
             if (menu.getType().isEmpty()) {
                 throw new RMValidateException(new ErrorDetail(
                         new Date().toString(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         RMConstant.MENU_BAD_REQUEST));
             }
-            menu.setId(id);
-            typeRepository.saveAll(menu.getType());
-            return menuRepository.save(menu);
+            List<Type> types = typeService.saveAllType(menu.getType());
+            Menu menuToUpdate = MenuMapper.menuDTOToMenuMapper(menu);
+            menuToUpdate.setType(types);
+            menuRepository.save(menuToUpdate);
+            return menu;
         }
     }
 
@@ -97,8 +108,8 @@ public class MenuService {
         else
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
     }
 }

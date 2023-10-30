@@ -1,8 +1,15 @@
 package com.restapi.utils;
 
+import com.restapi.dto.MenuDTO;
+import com.restapi.dto.TypeDTO;
+import com.restapi.models.Menu;
+import com.restapi.models.Type;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RMUtils {
 

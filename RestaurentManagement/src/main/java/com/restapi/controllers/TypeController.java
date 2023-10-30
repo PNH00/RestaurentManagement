@@ -1,5 +1,6 @@
 package com.restapi.controllers;
 
+import com.restapi.dto.TypeDTO;
 import com.restapi.models.Type;
 import com.restapi.services.TypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,26 +22,25 @@ public class TypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Type>> getAllTypes() {
-        List<Type> types = typeService.getAllTypes();
+    public ResponseEntity<List<TypeDTO>> getAllTypes() {
+        List<TypeDTO> types = typeService.getAllTypes();
         return new ResponseEntity<>(types, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTypeById(@PathVariable UUID id) {
-        Optional<Type> type = typeService.getTypeById(id);
-        return type.isPresent() ?
-                new ResponseEntity<>(type.get(),HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        TypeDTO type = typeService.getTypeById(id);
+        return new ResponseEntity<>(type,HttpStatus.OK);
+
     }
 
     @PostMapping
-    public Type createType(@RequestBody Type type) {
+    public TypeDTO createType(@RequestBody TypeDTO type) {
         return typeService.createType(type);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateType(@PathVariable UUID id, @RequestBody Type type) {
+    public ResponseEntity<?> updateType(@PathVariable UUID id, @RequestBody TypeDTO type) {
         return new ResponseEntity<>(typeService.updateType(id,type),HttpStatus.OK);
     }
 

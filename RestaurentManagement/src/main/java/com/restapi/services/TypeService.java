@@ -1,17 +1,17 @@
 package com.restapi.services;
 
+import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
+import com.restapi.mapper.TypeMapper;
 import com.restapi.models.Type;
 import com.restapi.repositories.TypeRepository;
 import com.restapi.constants.RMConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 
 @Service
 public class TypeService {
@@ -23,33 +23,53 @@ public class TypeService {
         this.typeRepository = typeRepository;
     }
 
-    public List<Type> getAllTypes() {
-        return typeRepository.findAll();
+    public List<TypeDTO> getAllTypes() {
+        List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
+        for (Type type: typeRepository.findAll()) {
+            typeDTOs.add(TypeMapper.typeToTypeDTOMapper(type));
+        }
+        return typeDTOs;
     }
 
-    public Optional<Type> getTypeById(UUID id) {
-        if (!typeRepository.existsById(id))
+    public TypeDTO getTypeById(UUID id) {
+        if (typeRepository.findById(id).isEmpty())
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
-        return typeRepository.findById(id);
+        return TypeMapper.typeToTypeDTOMapper(typeRepository.findById(id).get());
     }
 
-    public Type createType(Type type) {
-        return typeRepository.save(type);
+    public TypeDTO createType(TypeDTO type) {
+        Type typeToCreate = new Type();
+        typeToCreate.setType(type.getType());
+        typeRepository.save(typeToCreate);
+        return type;
     }
 
-    public Type updateType(UUID id, Type type) {
+    public List<Type> saveAllType(List<TypeDTO> typeDTOs){
+        List<Type> types = new ArrayList<Type>();
+        for (TypeDTO typeDTO : typeDTOs) {
+            Type type = new Type();
+            type.setType(typeDTO.getType());
+            types.add(type);
+        }
+        typeRepository.saveAll(types);
+        return types;
+    }
+
+    public TypeDTO updateType(UUID id, TypeDTO type) {
         if (typeRepository.existsById(id)) {
-            type.setId(id);
-            return typeRepository.save(type);
+            Type typeToUpdate = new Type();
+            typeToUpdate.setId(id);
+            typeRepository.save(typeToUpdate);
+            return type;
         }
         throw new RMValidateException(new ErrorDetail(
                 new Date().toString(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
                 HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
                 RMConstant.TYPE_NOT_FOUND));
     }
 
@@ -57,17 +77,17 @@ public class TypeService {
         if (!typeRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
         try {
             typeRepository.deleteById(id);
         }catch (Exception e){
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    RMConstant.TYPE_INTERNAL_SERVER_ERROR));
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    RMConstant.INTERNAL_SERVER_ERROR));
         }
     }
 }
