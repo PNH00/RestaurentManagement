@@ -1,10 +1,10 @@
 package com.restapi.services;
 
 import com.restapi.dto.MenuDTO;
+import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.mapper.MenuMapper;
-import com.restapi.mapper.TypeMapper;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
@@ -30,7 +30,7 @@ public class MenuService {
         this.typeRepository = typeRepository;
     }
 
-    public MenuDTO createMenu(Menu menu) {
+    public MenuDTO createMenu(MenuDTO menu) {
         if (menu.getType().isEmpty()) {
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
@@ -38,20 +38,23 @@ public class MenuService {
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     RMConstant.TYPE_BAD_REQUEST));
         }
-        List<Type> types = menu.getType();
-        List<Type> existingTypes = new ArrayList<>();
-        for (Type type : types) {
-            if (type.getId() != null && typeRepository.existsById(type.getId())) {
-                existingTypes.add(type);
-            } else {
-                Type newType = typeRepository.save(type);
-                existingTypes.add(newType);
-            }
+        List<Type> types = new ArrayList<>();
+        for (TypeDTO typeDTO : menu.getType()) {
+            Type type = new Type();
+            type.setType(typeDTO.getType());
+            types.add(type);
         }
-        menu.setType(existingTypes);
+        Menu menuToCreate = new Menu();
+        menuToCreate.setName(menu.getName());
+        menuToCreate.setDescription(menu.getDescription());
+        menuToCreate.setPrice(menu.getPrice());
+        menuToCreate.setImage(menu.getImage());
+        menuToCreate.setType(types);
+
+        typeRepository.saveAll(types);
         try {
-            Menu menuCreated = menuRepository.save(menu);
-            return MenuMapper.menuMapper(menuCreated);
+            menuRepository.save(menuToCreate);
+            return menu;
         }catch (Exception e){
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
@@ -69,7 +72,7 @@ public class MenuService {
         if (pagedResult.hasContent()){
             List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
             for (Menu menu : pagedResult.getContent())  {
-                menuDTOs.add(MenuMapper.menuMapper(menu));
+                menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
             }
             return menuDTOs;
         }
@@ -84,10 +87,10 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
-        return MenuMapper.menuMapper(menuRepository.findById(id).get());
+        return MenuMapper.menuToMenuDTOMapper(menuRepository.findById(id).get());
     }
 
-    public MenuDTO updateMenu(UUID id, Menu menu) {
+    public MenuDTO updateMenu(UUID id, MenuDTO menu) {
         if(!menuRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
@@ -102,10 +105,22 @@ public class MenuService {
                         HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         RMConstant.MENU_BAD_REQUEST));
             }
-            menu.setId(id);
-            typeRepository.saveAll(menu.getType());
-            Menu menuUpdated = menuRepository.save(menu);
-            return MenuMapper.menuMapper(menuUpdated);
+            List<Type> types = new ArrayList<>();
+            for (TypeDTO typeDTO : menu.getType()) {
+                Type type = new Type();
+                type.setType(typeDTO.getType());
+                types.add(type);
+            }
+            Menu menuToUpdate = new Menu();
+            menuToUpdate.setId(id);
+            menuToUpdate.setName(menu.getName());
+            menuToUpdate.setDescription(menu.getDescription());
+            menuToUpdate.setImage(menu.getImage());
+            menuToUpdate.setPrice(menu.getPrice());
+            menuToUpdate.setType(types);
+            typeRepository.saveAll(types);
+            menuRepository.save(menuToUpdate);
+            return menu;
         }
     }
 

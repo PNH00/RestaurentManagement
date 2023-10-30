@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -24,7 +23,7 @@ public class MenuController {
     }
 
     @PostMapping
-    public MenuDTO createMenu(@RequestBody Menu menu) {
+    public MenuDTO createMenu(@RequestBody MenuDTO menu) {
         return menuService.createMenu(menu);
     }
 
@@ -46,7 +45,7 @@ public class MenuController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMenu(@PathVariable UUID id, @RequestBody Menu menu) {
+    public ResponseEntity<?> updateMenu(@PathVariable UUID id, @RequestBody MenuDTO menu) {
         return new  ResponseEntity<>(menuService.updateMenu(id, menu),HttpStatus.OK);
     }
 

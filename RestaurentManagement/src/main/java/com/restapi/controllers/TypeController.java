@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -36,12 +35,12 @@ public class TypeController {
     }
 
     @PostMapping
-    public TypeDTO createType(@RequestBody Type type) {
+    public TypeDTO createType(@RequestBody TypeDTO type) {
         return typeService.createType(type);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateType(@PathVariable UUID id, @RequestBody Type type) {
+    public ResponseEntity<?> updateType(@PathVariable UUID id, @RequestBody TypeDTO type) {
         return new ResponseEntity<>(typeService.updateType(id,type),HttpStatus.OK);
     }
 

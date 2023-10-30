@@ -7,7 +7,6 @@ import com.restapi.mapper.TypeMapper;
 import com.restapi.models.Type;
 import com.restapi.repositories.TypeRepository;
 import com.restapi.constants.RMConstant;
-import com.restapi.utils.RMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class TypeService {
     public List<TypeDTO> getAllTypes() {
         List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
         for (Type type: typeRepository.findAll()) {
-            typeDTOs.add(TypeMapper.typeMapper(type));
+            typeDTOs.add(TypeMapper.typeToTypeDTOMapper(type));
         }
         return typeDTOs;
     }
@@ -39,18 +38,22 @@ public class TypeService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
-        return TypeMapper.typeMapper(typeRepository.findById(id).get());
+        return TypeMapper.typeToTypeDTOMapper(typeRepository.findById(id).get());
     }
 
-    public TypeDTO createType(Type type) {
-        return TypeMapper.typeMapper(typeRepository.save(type));
+    public TypeDTO createType(TypeDTO type) {
+        Type typeToCreate = new Type();
+        typeToCreate.setType(type.getType());
+        typeRepository.save(typeToCreate);
+        return type;
     }
 
-    public TypeDTO updateType(UUID id, Type type) {
+    public TypeDTO updateType(UUID id, TypeDTO type) {
         if (typeRepository.existsById(id)) {
-            type.setId(id);
-            Type typeUpdated = typeRepository.save(type);
-            return TypeMapper.typeMapper(typeUpdated);
+            Type typeToUpdate = new Type();
+            typeToUpdate.setId(id);
+            typeRepository.save(typeToUpdate);
+            return type;
         }
         throw new RMValidateException(new ErrorDetail(
                 new Date().toString(),

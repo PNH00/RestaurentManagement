@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TypeMapper {
-    public static TypeDTO typeMapper(Type type){
+    public static TypeDTO typeToTypeDTOMapper(Type type){
         return new TypeDTO(type.getType());
     }
 
-    public static List<TypeDTO> typeMapper(List<Type> types){
+    public static List<TypeDTO> typeToTypeDTOMapper(List<Type> types){
         List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
         for (Type type:types) {
-            typeDTOs.add(typeMapper(type));
+            typeDTOs.add(typeToTypeDTOMapper(type));
         }
         return typeDTOs;
     }
