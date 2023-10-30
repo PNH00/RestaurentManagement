@@ -1,13 +1,14 @@
 package com.restapi.exceptions;
 
+import com.restapi.response.ErrorResponse;
+import lombok.Getter;
+
+@Getter
 public class RMValidateException extends RuntimeException {
-    private final ErrorDetail errorDetail;
+    private final ErrorResponse errorResponse;
 
-    public RMValidateException(ErrorDetail errorDetail) {
-        this.errorDetail = errorDetail;
+    public RMValidateException(ErrorResponse errorResponse) {
+        this.errorResponse = errorResponse;
     }
 
-    public ErrorDetail getErrorDetail() {
-        return errorDetail;
-    }
 }

@@ -1,7 +1,7 @@
 package com.restapi.controllers;
 
 import com.restapi.dto.TypeDTO;
-import com.restapi.models.Type;
+import com.restapi.response.SuccessResponse;
 import com.restapi.services.TypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,31 +22,55 @@ public class TypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TypeDTO>> getAllTypes() {
+    public ResponseEntity<SuccessResponse> getAllTypes() {
         List<TypeDTO> types = typeService.getAllTypes();
-        return new ResponseEntity<>(types, HttpStatus.OK);
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Get type successfully!",
+                types);
+        return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTypeById(@PathVariable UUID id) {
-        TypeDTO type = typeService.getTypeById(id);
-        return new ResponseEntity<>(type,HttpStatus.OK);
+    public ResponseEntity<SuccessResponse> getTypeById(@PathVariable UUID id) {
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Get type successfully!",
+                typeService.getTypeById(id));
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
 
     }
 
     @PostMapping
-    public TypeDTO createType(@RequestBody TypeDTO type) {
-        return typeService.createType(type);
+    public ResponseEntity<SuccessResponse> createType(@RequestBody TypeDTO type) {
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Create type successfully!",
+                typeService.createType(type));
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateType(@PathVariable UUID id, @RequestBody TypeDTO type) {
-        return new ResponseEntity<>(typeService.updateType(id,type),HttpStatus.OK);
+    public ResponseEntity<SuccessResponse> updateType(@PathVariable UUID id, @RequestBody TypeDTO type) {
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Update type successfully!",
+                typeService.updateType(id,type));
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteType(@PathVariable UUID id) {
+    public ResponseEntity<SuccessResponse> deleteType(@PathVariable UUID id) {
         typeService.deleteType(id);
-        return new ResponseEntity<>("Delete success!", HttpStatus.OK);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Delete type successfully!",
+                "No data response");
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 }
