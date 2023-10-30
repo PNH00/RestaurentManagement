@@ -3,6 +3,8 @@ package com.restapi.services;
 import com.restapi.dto.MenuDTO;
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
+import com.restapi.mapper.MenuMapper;
+import com.restapi.mapper.TypeMapper;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
@@ -49,7 +51,7 @@ public class MenuService {
         menu.setType(existingTypes);
         try {
             Menu menuCreated = menuRepository.save(menu);
-            return RMUtils.menuMapper(menuCreated);
+            return MenuMapper.menuMapper(menuCreated);
         }catch (Exception e){
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
@@ -67,7 +69,7 @@ public class MenuService {
         if (pagedResult.hasContent()){
             List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
             for (Menu menu : pagedResult.getContent())  {
-                menuDTOs.add(RMUtils.menuMapper(menu));
+                menuDTOs.add(MenuMapper.menuMapper(menu));
             }
             return menuDTOs;
         }
@@ -82,7 +84,7 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
-        return RMUtils.menuMapper(menuRepository.findById(id).get());
+        return MenuMapper.menuMapper(menuRepository.findById(id).get());
     }
 
     public MenuDTO updateMenu(UUID id, Menu menu) {
@@ -103,7 +105,7 @@ public class MenuService {
             menu.setId(id);
             typeRepository.saveAll(menu.getType());
             Menu menuUpdated = menuRepository.save(menu);
-            return RMUtils.menuMapper(menuUpdated);
+            return MenuMapper.menuMapper(menuUpdated);
         }
     }
 

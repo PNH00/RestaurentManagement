@@ -3,6 +3,7 @@ package com.restapi.services;
 import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.ErrorDetail;
 import com.restapi.exceptions.RMValidateException;
+import com.restapi.mapper.TypeMapper;
 import com.restapi.models.Type;
 import com.restapi.repositories.TypeRepository;
 import com.restapi.constants.RMConstant;
@@ -26,7 +27,7 @@ public class TypeService {
     public List<TypeDTO> getAllTypes() {
         List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
         for (Type type: typeRepository.findAll()) {
-            typeDTOs.add(RMUtils.typeMapper(type));
+            typeDTOs.add(TypeMapper.typeMapper(type));
         }
         return typeDTOs;
     }
@@ -38,18 +39,18 @@ public class TypeService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
-        return RMUtils.typeMapper(typeRepository.findById(id).get());
+        return TypeMapper.typeMapper(typeRepository.findById(id).get());
     }
 
     public TypeDTO createType(Type type) {
-        return RMUtils.typeMapper(typeRepository.save(type));
+        return TypeMapper.typeMapper(typeRepository.save(type));
     }
 
     public TypeDTO updateType(UUID id, Type type) {
         if (typeRepository.existsById(id)) {
             type.setId(id);
             Type typeUpdated = typeRepository.save(type);
-            return RMUtils.typeMapper(typeUpdated);
+            return TypeMapper.typeMapper(typeUpdated);
         }
         throw new RMValidateException(new ErrorDetail(
                 new Date().toString(),
