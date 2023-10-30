@@ -22,12 +22,12 @@ import java.util.*;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final TypeRepository typeRepository;
+    private final TypeService typeService;
 
     @Autowired
-    public MenuService(MenuRepository menuRepository, TypeRepository typeRepository) {
+    public MenuService(MenuRepository menuRepository, TypeRepository typeRepository, TypeService typeService) {
         this.menuRepository = menuRepository;
-        this.typeRepository = typeRepository;
+        this.typeService = typeService;
     }
 
     public MenuDTO createMenu(MenuDTO menu) {
@@ -38,20 +38,9 @@ public class MenuService {
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     RMConstant.TYPE_BAD_REQUEST));
         }
-        List<Type> types = new ArrayList<>();
-        for (TypeDTO typeDTO : menu.getType()) {
-            Type type = new Type();
-            type.setType(typeDTO.getType());
-            types.add(type);
-        }
-        Menu menuToCreate = new Menu();
-        menuToCreate.setName(menu.getName());
-        menuToCreate.setDescription(menu.getDescription());
-        menuToCreate.setPrice(menu.getPrice());
-        menuToCreate.setImage(menu.getImage());
+        List<Type> types = typeService.saveAllType(menu.getType());
+        Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
         menuToCreate.setType(types);
-
-        typeRepository.saveAll(types);
         try {
             menuRepository.save(menuToCreate);
             return menu;
@@ -105,20 +94,9 @@ public class MenuService {
                         HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         RMConstant.MENU_BAD_REQUEST));
             }
-            List<Type> types = new ArrayList<>();
-            for (TypeDTO typeDTO : menu.getType()) {
-                Type type = new Type();
-                type.setType(typeDTO.getType());
-                types.add(type);
-            }
-            Menu menuToUpdate = new Menu();
-            menuToUpdate.setId(id);
-            menuToUpdate.setName(menu.getName());
-            menuToUpdate.setDescription(menu.getDescription());
-            menuToUpdate.setImage(menu.getImage());
-            menuToUpdate.setPrice(menu.getPrice());
+            List<Type> types = typeService.saveAllType(menu.getType());
+            Menu menuToUpdate = MenuMapper.menuDTOToMenuMapper(menu);
             menuToUpdate.setType(types);
-            typeRepository.saveAll(types);
             menuRepository.save(menuToUpdate);
             return menu;
         }

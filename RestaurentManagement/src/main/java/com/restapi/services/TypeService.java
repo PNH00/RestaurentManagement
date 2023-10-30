@@ -48,6 +48,17 @@ public class TypeService {
         return type;
     }
 
+    public List<Type> saveAllType(List<TypeDTO> typeDTOs){
+        List<Type> types = new ArrayList<Type>();
+        for (TypeDTO typeDTO : typeDTOs) {
+            Type type = new Type();
+            type.setType(typeDTO.getType());
+            types.add(type);
+        }
+        typeRepository.saveAll(types);
+        return types;
+    }
+
     public TypeDTO updateType(UUID id, TypeDTO type) {
         if (typeRepository.existsById(id)) {
             Type typeToUpdate = new Type();
