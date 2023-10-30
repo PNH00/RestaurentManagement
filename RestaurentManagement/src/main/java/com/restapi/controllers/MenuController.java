@@ -1,7 +1,7 @@
 package com.restapi.controllers;
 
 import com.restapi.dto.MenuDTO;
-import com.restapi.models.Menu;
+import com.restapi.response.SuccessResponse;
 import com.restapi.services.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -23,8 +23,13 @@ public class MenuController {
     }
 
     @PostMapping
-    public MenuDTO createMenu(@RequestBody MenuDTO menu) {
-        return menuService.createMenu(menu);
+    public ResponseEntity<SuccessResponse> createMenu(@RequestBody MenuDTO menu) {
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Create menu successfully!",
+                menuService.createMenu(menu));
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 
     @GetMapping
@@ -39,19 +44,33 @@ public class MenuController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMenuById(@PathVariable UUID id) {
-        MenuDTO menu = menuService.getMenuById(id);
-        return new ResponseEntity<>(menu,HttpStatus.OK);
+    public ResponseEntity<SuccessResponse> getMenuById(@PathVariable UUID id) {
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Get menu successfully!",
+                menuService.getMenuById(id));
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMenu(@PathVariable UUID id, @RequestBody MenuDTO menu) {
-        return new  ResponseEntity<>(menuService.updateMenu(id, menu),HttpStatus.OK);
+    public ResponseEntity<SuccessResponse> updateMenu(@PathVariable UUID id, @RequestBody MenuDTO menu) {
+        SuccessResponse  successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Update menu successfully!",
+                menuService.updateMenu(id,menu));
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMenu(@PathVariable UUID id) {
+    public ResponseEntity<SuccessResponse> deleteMenu(@PathVariable UUID id) {
         menuService.deleteMenu(id);
-        return new ResponseEntity<>("Delete success!", HttpStatus.OK);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Delete menu successfully!",
+                "No data response");
+        return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 }

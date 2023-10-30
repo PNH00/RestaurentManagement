@@ -1,14 +1,12 @@
 package com.restapi.services;
 
 import com.restapi.dto.MenuDTO;
-import com.restapi.dto.TypeDTO;
-import com.restapi.exceptions.ErrorDetail;
+import com.restapi.response.ErrorResponse;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.mapper.MenuMapper;
 import com.restapi.models.Menu;
 import com.restapi.models.Type;
 import com.restapi.repositories.MenuRepository;
-import com.restapi.repositories.TypeRepository;
 import com.restapi.constants.RMConstant;
 import com.restapi.utils.RMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,7 @@ public class MenuService {
 
     public MenuDTO createMenu(MenuDTO menu) {
         if (menu.getType().isEmpty()) {
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.BAD_REQUEST.value(),
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -45,7 +43,7 @@ public class MenuService {
             menuRepository.save(menuToCreate);
             return menu;
         }catch (Exception e){
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
@@ -62,6 +60,7 @@ public class MenuService {
             List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
             for (Menu menu : pagedResult.getContent())  {
                 menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
+                System.out.println(menu.getId());
             }
             return menuDTOs;
         }
@@ -71,7 +70,7 @@ public class MenuService {
 
     public MenuDTO getMenuById(UUID id){
         if (menuRepository.findById(id).isEmpty())
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
@@ -81,14 +80,14 @@ public class MenuService {
 
     public MenuDTO updateMenu(UUID id, MenuDTO menu) {
         if(!menuRepository.existsById(id))
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         else {
             if (menu.getType().isEmpty()) {
-                throw new RMValidateException(new ErrorDetail(
+                throw new RMValidateException(new ErrorResponse(
                         new Date().toString(),
                         HttpStatus.BAD_REQUEST.value(),
                         HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -106,7 +105,7 @@ public class MenuService {
         if(menuRepository.existsById(id))
             menuRepository.deleteById(id);
         else
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),

@@ -1,7 +1,7 @@
 package com.restapi.services;
 
 import com.restapi.dto.TypeDTO;
-import com.restapi.exceptions.ErrorDetail;
+import com.restapi.response.ErrorResponse;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.mapper.TypeMapper;
 import com.restapi.models.Type;
@@ -33,7 +33,7 @@ public class TypeService {
 
     public TypeDTO getTypeById(UUID id) {
         if (typeRepository.findById(id).isEmpty())
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
@@ -66,7 +66,7 @@ public class TypeService {
             typeRepository.save(typeToUpdate);
             return type;
         }
-        throw new RMValidateException(new ErrorDetail(
+        throw new RMValidateException(new ErrorResponse(
                 new Date().toString(),
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
@@ -75,7 +75,7 @@ public class TypeService {
 
     public void deleteType(UUID id){
         if (!typeRepository.existsById(id))
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
@@ -83,7 +83,7 @@ public class TypeService {
         try {
             typeRepository.deleteById(id);
         }catch (Exception e){
-            throw new RMValidateException(new ErrorDetail(
+            throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
