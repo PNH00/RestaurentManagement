@@ -1,5 +1,7 @@
 package com.restapi.controllers;
 
+import com.restapi.dto.TypeDTO;
+import com.restapi.exceptions.SuccessfulResponse;
 import com.restapi.models.Type;
 import com.restapi.services.TypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,21 +23,19 @@ public class TypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Type>> getAllTypes() {
-        List<Type> types = typeService.getAllTypes();
+    public ResponseEntity<List<TypeDTO>> getAllTypes() {
+        List<TypeDTO> types = typeService.getAllTypes();
         return new ResponseEntity<>(types, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTypeById(@PathVariable UUID id) {
-        Optional<Type> type = typeService.getTypeById(id);
-        return type.isPresent() ?
-                new ResponseEntity<>(type.get(),HttpStatus.OK):
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        SuccessfulResponse type = typeService.getTypeById(id);
+        return new ResponseEntity<>(type,HttpStatus.OK);
     }
 
     @PostMapping
-    public Type createType(@RequestBody Type type) {
+    public SuccessfulResponse createType(@RequestBody Type type) {
         return typeService.createType(type);
     }
 
@@ -47,7 +46,6 @@ public class TypeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteType(@PathVariable UUID id) {
-        typeService.deleteType(id);
-        return new ResponseEntity<>("Delete success!", HttpStatus.OK);
+        return new ResponseEntity<>(typeService.deleteType(id), HttpStatus.OK);
     }
 }

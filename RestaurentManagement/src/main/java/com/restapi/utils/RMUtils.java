@@ -1,8 +1,14 @@
 package com.restapi.utils;
 
+import com.restapi.dto.MenuDTO;
+import com.restapi.dto.TypeDTO;
+import com.restapi.models.Menu;
+import com.restapi.models.Type;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RMUtils {
 
@@ -35,5 +41,23 @@ public class RMUtils {
         }else {
             return PageRequest.of(truePage, trueSize, Sort.by(Sort.Order.desc(sortBy)));
         }
+    }
+
+    public static TypeDTO typeMapper(Type type){
+        return new TypeDTO(type.getType());
+    }
+    public static MenuDTO menuMapper(Menu menu){
+        MenuDTO menuDTO = new MenuDTO();
+        menuDTO.setName(menu.getName());
+        menuDTO.setDescription(menu.getDescription());
+        menuDTO.setImage(menu.getImage());
+        menuDTO.setPrice(menu.getPrice());
+
+        List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
+        for (Type type : menu.getType()) {
+            typeDTOs.add(new TypeDTO(type.getType()));
+        }
+        menuDTO.setType(typeDTOs);
+        return menuDTO;
     }
 }

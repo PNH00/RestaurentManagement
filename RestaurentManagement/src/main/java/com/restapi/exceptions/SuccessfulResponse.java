@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ErrorDetail {
-    private String timestamp;
+public class SuccessfulResponse {
+
     private int code;
     private String status;
     private String message;
+    private Object data;
 }
