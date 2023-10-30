@@ -1,7 +1,9 @@
 package com.restapi.exceptions;
 
 import com.restapi.response.ErrorResponse;
+import lombok.Getter;
 
+@Getter
 public class RMValidateException extends RuntimeException {
     private final ErrorResponse errorResponse;
 
@@ -9,7 +11,4 @@ public class RMValidateException extends RuntimeException {
         this.errorResponse = errorDetail;
     }
 
-    public ErrorResponse getErrorDetail() {
-        return errorResponse;
-    }
 }

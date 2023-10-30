@@ -60,7 +60,6 @@ public class MenuService {
             List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
             for (Menu menu : pagedResult.getContent())  {
                 menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
-                System.out.println(menu.getId());
             }
             return menuDTOs;
         }
