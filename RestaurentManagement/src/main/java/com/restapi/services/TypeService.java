@@ -31,8 +31,8 @@ public class TypeService {
         if (!typeRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
         return typeRepository.findById(id);
     }
@@ -48,8 +48,8 @@ public class TypeService {
         }
         throw new RMValidateException(new ErrorDetail(
                 new Date().toString(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
                 HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
                 RMConstant.TYPE_NOT_FOUND));
     }
 
@@ -57,17 +57,17 @@ public class TypeService {
         if (!typeRepository.existsById(id))
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
         try {
             typeRepository.deleteById(id);
         }catch (Exception e){
             throw new RMValidateException(new ErrorDetail(
                     new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    RMConstant.TYPE_INTERNAL_SERVER_ERROR));
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    RMConstant.INTERNAL_SERVER_ERROR));
         }
     }
 }
