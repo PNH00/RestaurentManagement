@@ -2,7 +2,8 @@ package com.restapi.mapper;
 
 import com.restapi.dto.MenuDTO;
 import com.restapi.models.Menu;
-import com.restapi.models.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuMapper {
     public static MenuDTO menuToMenuDTOMapper(Menu menu){
@@ -20,5 +21,13 @@ public class MenuMapper {
         menu.setPrice(menuDTO.getPrice());
         menu.setDescription(menuDTO.getDescription());
         return menu;
+    }
+
+    public static List<MenuDTO> convertToMenuDTOList(List<Menu> menus) {
+        List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
+        for (Menu menu : menus) {
+            menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
+        }
+        return menuDTOs;
     }
 }

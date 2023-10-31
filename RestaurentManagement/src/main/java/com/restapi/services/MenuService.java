@@ -110,4 +110,17 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
     }
+
+    public List<MenuDTO> searchMenus(String keyword) {
+        List<Menu> menusByName = menuRepository.findByNameEquals(keyword);
+        List<Menu> menusByDescription = menuRepository.findByDescriptionEquals(keyword);
+        List<Menu> menusByType = menuRepository.findByType_TypeContaining(keyword);
+
+        List<Menu> menus = new ArrayList<Menu>();
+        menus.addAll(menusByName);
+        menus.addAll(menusByDescription);
+        menus.addAll(menusByType);
+
+        return MenuMapper.convertToMenuDTOList(menus);
+    }
 }

@@ -2,7 +2,6 @@ package com.restapi.mapper;
 
 import com.restapi.dto.TypeDTO;
 import com.restapi.models.Type;
-
 import java.util.ArrayList;
 import java.util.List;
 
