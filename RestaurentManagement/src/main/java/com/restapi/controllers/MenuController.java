@@ -78,4 +78,14 @@ public class MenuController {
                 "No data response");
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<SuccessResponse> searchMenus(@RequestParam(required = false) String keyword) {
+        SuccessResponse successResponseFound = new SuccessResponse(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Search menus successfully!",
+                menuService.searchMenus(keyword));
+        return new ResponseEntity<>(successResponseFound,HttpStatus.OK);
+    }
 }
