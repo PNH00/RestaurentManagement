@@ -112,14 +112,29 @@ public class MenuService {
     }
 
     public List<MenuDTO> searchMenus(String keyword) {
+        if (keyword==null){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    RMConstant.MENU_NOT_FOUND));
+        }
         List<Menu> menusByName = menuRepository.findByNameEquals(keyword);
         List<Menu> menusByDescription = menuRepository.findByDescriptionEquals(keyword);
-        List<Menu> menusByType = menuRepository.findByType_TypeContaining(keyword);
+        List<Menu> menusByType = menuRepository.findByTypeTypeEquals(keyword);
 
         List<Menu> menus = new ArrayList<Menu>();
         menus.addAll(menusByName);
         menus.addAll(menusByDescription);
         menus.addAll(menusByType);
+
+        if (menus.isEmpty()){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    RMConstant.MENU_NOT_FOUND));
+        }
 
         return MenuMapper.convertToMenuDTOList(menus);
     }
