@@ -123,12 +123,12 @@ public class MenuService {
         List<Menu> menusByDescription = menuRepository.findByDescriptionEquals(keyword);
         List<Menu> menusByType = menuRepository.findByTypeTypeEquals(keyword);
 
-        List<Menu> menus = new ArrayList<Menu>();
-        menus.addAll(menusByName);
-        menus.addAll(menusByDescription);
-        menus.addAll(menusByType);
+        Set<Menu> uniqueMenus = new HashSet<>();
+        uniqueMenus.addAll(menusByName);
+        uniqueMenus.addAll(menusByDescription);
+        uniqueMenus.addAll(menusByType);
 
-        if (menus.isEmpty()){
+        if (uniqueMenus.isEmpty()){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
@@ -136,6 +136,6 @@ public class MenuService {
                     RMConstant.MENU_NOT_FOUND));
         }
 
-        return MenuMapper.convertToMenuDTOList(menus);
+        return MenuMapper.convertToMenuDTOList(new ArrayList<>(uniqueMenus));
     }
 }
