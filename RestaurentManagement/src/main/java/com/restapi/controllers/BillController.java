@@ -1,7 +1,6 @@
 package com.restapi.controllers;
 
 import com.restapi.dto.BillDTO;
-import com.restapi.models.Bill;
 import com.restapi.response.SuccessResponse;
 import com.restapi.services.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class BillController {
         this.billService = billService;
     }
     @PostMapping
-    public ResponseEntity<SuccessResponse> createBill(@RequestBody Bill bill) {
+    public ResponseEntity<SuccessResponse> createBill(@RequestBody BillDTO bill) {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
@@ -32,12 +31,12 @@ public class BillController {
 
     @GetMapping
     public ResponseEntity<SuccessResponse> getAllBills() {
-        List<BillDTO> types = billService.getAllBills();
+        List<BillDTO> billDTOs = billService.getAllBills();
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get bill successfully!",
-                types);
+                "Get bills successfully!",
+                billDTOs);
         return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
 
@@ -52,12 +51,12 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SuccessResponse> updateBill(@PathVariable UUID id, @RequestBody Bill bill) {
+    public ResponseEntity<SuccessResponse> updateBill(@PathVariable UUID id, @RequestBody BillDTO billDTO) {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
                 "Update bill successfully!",
-                billService.updateBill(id,bill));
+                billService.updateBill(id,billDTO));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 

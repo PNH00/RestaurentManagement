@@ -43,7 +43,7 @@ public class MenuController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get menu successfully!",
+                "Get menus successfully!",
                 list);
         return new ResponseEntity<>(successResponse,new HttpHeaders(), HttpStatus.OK);
     }

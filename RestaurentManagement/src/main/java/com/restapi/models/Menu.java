@@ -17,7 +17,7 @@ public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    @Column(nullable = false,columnDefinition = "nvarchar(50)")
+    @Column(nullable = false,columnDefinition = "nvarchar(50)",unique = true)
     private String name;
     @Column(nullable = false,columnDefinition = "nvarchar(50)")
     private String description;

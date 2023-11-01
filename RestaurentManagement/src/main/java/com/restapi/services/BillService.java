@@ -2,12 +2,12 @@ package com.restapi.services;
 
 import com.restapi.constants.RMConstant;
 import com.restapi.dto.BillDTO;
+import com.restapi.dto.MenuDTO;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.mapper.BillMapper;
 import com.restapi.models.Bill;
 import com.restapi.models.Menu;
 import com.restapi.repositories.BillRepository;
-import com.restapi.repositories.MenuRepository;
 import com.restapi.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,15 +17,15 @@ import java.util.*;
 public class BillService {
 
     private final BillRepository billRepository;
-    private final MenuRepository menuRepository;
+    private final MenuService menuService;
 
-    public BillService(BillRepository billRepository, MenuRepository menuRepository) {
+    public BillService(BillRepository billRepository, MenuService menuService) {
         this.billRepository = billRepository;
-        this.menuRepository = menuRepository;
+        this.menuService = menuService;
     }
 
-    public Bill createBill(Bill bill) {
-        if (bill.getMenus().isEmpty()) {
+    public BillDTO createBill(BillDTO billDTO) {
+        if (billDTO.getMenus().isEmpty()) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.BAD_REQUEST.value(),
@@ -34,21 +34,24 @@ public class BillService {
         }
         try {
             List<Menu> menus = new ArrayList<>();
-            for (Menu menu : bill.getMenus()) {
-                if (menuRepository.findById(menu.getId()).isEmpty()) {
+            for (MenuDTO menuDTO : billDTO.getMenus()) {
+                Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+                System.out.println(menuSearch);
+                if (menuSearch!=null) {
+                    menus.add(menuSearch);
+                } else {
                     throw new RMValidateException(new ErrorResponse(
                             new Date().toString(),
                             HttpStatus.NOT_FOUND.value(),
                             HttpStatus.NOT_FOUND.getReasonPhrase(),
                             RMConstant.MENU_NOT_FOUND));
-                } else {
-                    menus.add(menuRepository.findById(menu.getId()).get());
                 }
             }
+            Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setMenus(menus);
             bill.setQuantities(menus.size());
             billRepository.save(bill);
-            return bill;
+            return billDTO;
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -77,7 +80,7 @@ public class BillService {
         return BillMapper.billToBillDTOMapper(billRepository.findById(id).get());
     }
 
-    public Bill updateBill(UUID id, Bill bill) {
+    public BillDTO updateBill(UUID id, BillDTO billDTO) {
         if(!billRepository.existsById(id))
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -85,7 +88,7 @@ public class BillService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.BILL_NOT_FOUND));
         else {
-            if (bill.getMenus().isEmpty()) {
+            if (billDTO.getMenus().isEmpty()) {
                 throw new RMValidateException(new ErrorResponse(
                         new Date().toString(),
                         HttpStatus.BAD_REQUEST.value(),
@@ -95,23 +98,26 @@ public class BillService {
         }
         try {
             List<Menu> menus = new ArrayList<>();
-            for (Menu menu : bill.getMenus()) {
-                if (menuRepository.findById(menu.getId()).isEmpty()) {
+            for (MenuDTO menuDTO : billDTO.getMenus()) {
+                Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+                System.out.println(menuSearch);
+                if (menuSearch!=null) {
+                    menus.add(menuSearch);
+                } else {
                     throw new RMValidateException(new ErrorResponse(
                             new Date().toString(),
                             HttpStatus.NOT_FOUND.value(),
                             HttpStatus.NOT_FOUND.getReasonPhrase(),
                             RMConstant.MENU_NOT_FOUND));
-                } else {
-                    menus.add(menuRepository.findById(menu.getId()).get());
                 }
             }
+            Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setId(id);
             bill.setMenus(menus);
             bill.setQuantities(menus.size());
             bill.setTotalPrice(bill.getTotalPrice());
             billRepository.save(bill);
-            return bill;
+            return billDTO;
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
