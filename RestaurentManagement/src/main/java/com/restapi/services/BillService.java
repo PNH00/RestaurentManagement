@@ -98,7 +98,6 @@ public class BillService {
             List<Menu> menus = new ArrayList<>();
             for (MenuDTO menuDTO : billDTO.getMenus()) {
                 Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
-                System.out.println(menuSearch);
                 if (menuSearch!=null) {
                     menus.add(menuSearch);
                 } else {
