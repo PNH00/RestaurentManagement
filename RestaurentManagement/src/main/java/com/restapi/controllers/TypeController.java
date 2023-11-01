@@ -27,7 +27,7 @@ public class TypeController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get type successfully!",
+                "Get types successfully!",
                 types);
         return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }

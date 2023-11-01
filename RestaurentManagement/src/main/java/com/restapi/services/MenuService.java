@@ -39,6 +39,13 @@ public class MenuService {
         List<Type> types = typeService.saveAllType(menu.getType());
         Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
         menuToCreate.setType(types);
+        if(searchMenusByName(menuToCreate.getName())!=null){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    RMConstant.NAME_EXISTED));
+        }
         try {
             menuRepository.save(menuToCreate);
             return menu;
@@ -57,11 +64,7 @@ public class MenuService {
         Pageable pageable = RMUtils.sortOrder(truePage,trueSize,sortBy,order);
         Page<Menu> pagedResult = menuRepository.findAll(pageable);
         if (pagedResult.hasContent()){
-            List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
-            for (Menu menu : pagedResult.getContent())  {
-                menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
-            }
-            return menuDTOs;
+            return MenuMapper.menuToMenuDTOMapper(pagedResult.getContent());
         }
         else
             return new ArrayList<MenuDTO>();
@@ -95,20 +98,32 @@ public class MenuService {
             List<Type> types = typeService.saveAllType(menu.getType());
             Menu menuToUpdate = MenuMapper.menuDTOToMenuMapper(menu);
             menuToUpdate.setType(types);
+            menuToUpdate.setId(id);
             menuRepository.save(menuToUpdate);
             return menu;
         }
     }
 
     public void deleteMenu(UUID id) {
-        if(menuRepository.existsById(id))
-            menuRepository.deleteById(id);
-        else
+        if(!menuRepository.existsById(id)){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
+        }
+        else{
+            try {
+                menuRepository.deleteById(id);
+            }catch (Exception e){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        RMConstant.BILL_INTERNAL_SERVER_ERROR));
+            }
+        }
+
     }
 
     public List<MenuDTO> searchMenus(String keyword) {
@@ -135,7 +150,25 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         }
-
         return MenuMapper.convertToMenuDTOList(new ArrayList<>(uniqueMenus));
+    }
+    public Menu searchMenusByName(String name) {
+        if (name==null){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    RMConstant.MENU_NOT_FOUND));
+        }
+        List<Menu> menusByName = menuRepository.findByNameEquals(name);
+        Set<Menu> uniqueMenus = new HashSet<>(menusByName);
+        if (uniqueMenus.isEmpty()){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    RMConstant.MENU_NOT_FOUND));
+        }
+        return new ArrayList<>(uniqueMenus).get(0);
     }
 }
