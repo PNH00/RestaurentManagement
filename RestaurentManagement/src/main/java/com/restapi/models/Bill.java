@@ -13,14 +13,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Bill {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @OneToMany
     private List<Menu> menus;
-    @Column(nullable = false,columnDefinition = "int")
+    @Column(nullable = false, columnDefinition = "int")
     private int quantities;
-    @Column(name = "total_price",nullable = false,columnDefinition = "float")
+    @Column(name = "total_price", nullable = false, columnDefinition = "float")
     private double totalPrice;
 }

@@ -14,6 +14,15 @@ public class MenuMapper {
                 menu.getPrice(),
                 TypeMapper.typeToTypeDTOMapper(menu.getType()));
     }
+
+    public static List<MenuDTO> menuToMenuDTOMapper(List<Menu> menus){
+        List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
+        for (Menu menu: menus) {
+            menuDTOs.add(menuToMenuDTOMapper(menu));
+        }
+        return menuDTOs;
+    }
+
     public static Menu menuDTOToMenuMapper(MenuDTO menuDTO){
         Menu menu = new Menu();
         menu.setName(menuDTO.getName());

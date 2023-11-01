@@ -95,20 +95,32 @@ public class MenuService {
             List<Type> types = typeService.saveAllType(menu.getType());
             Menu menuToUpdate = MenuMapper.menuDTOToMenuMapper(menu);
             menuToUpdate.setType(types);
+            menuToUpdate.setId(id);
             menuRepository.save(menuToUpdate);
             return menu;
         }
     }
 
     public void deleteMenu(UUID id) {
-        if(menuRepository.existsById(id))
-            menuRepository.deleteById(id);
-        else
+        if(!menuRepository.existsById(id)){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
+        }
+        else{
+            try {
+                menuRepository.deleteById(id);
+            }catch (Exception e){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        RMConstant.BILL_INTERNAL_SERVER_ERROR));
+            }
+        }
+
     }
 
     public List<MenuDTO> searchMenus(String keyword) {
