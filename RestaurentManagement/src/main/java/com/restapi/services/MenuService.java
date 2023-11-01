@@ -36,6 +36,13 @@ public class MenuService {
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     RMConstant.TYPE_BAD_REQUEST));
         }
+        if (menu.getPrice()<0){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Price cannot less than 0!"));
+        }
         List<Type> types = typeService.saveAllType(menu.getType());
         Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
         menuToCreate.setType(types);

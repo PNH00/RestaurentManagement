@@ -46,11 +46,11 @@ public class BillService {
                             RMConstant.MENU_NOT_FOUND));
                 }
             }
-            Bill bill = BillMapper.billDTOToBillMapper(billDTO);
+            BillDTO billDTOChecked = checkBillToPay(billDTO);
+            Bill bill = BillMapper.billDTOToBillMapper(billDTOChecked);
             bill.setMenus(menus);
-            bill.setQuantities(menus.size());
             billRepository.save(bill);
-            return billDTO;
+            return billDTOChecked;
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -108,13 +108,12 @@ public class BillService {
                             RMConstant.MENU_NOT_FOUND));
                 }
             }
-            Bill bill = BillMapper.billDTOToBillMapper(billDTO);
+            BillDTO billDTOChecked = checkBillToPay(billDTO);
+            Bill bill = BillMapper.billDTOToBillMapper(billDTOChecked);
             bill.setId(id);
             bill.setMenus(menus);
-            bill.setQuantities(menus.size());
-            bill.setTotalPrice(bill.getTotalPrice());
             billRepository.save(bill);
-            return billDTO;
+            return billDTOChecked;
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -133,5 +132,13 @@ public class BillService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.BILL_NOT_FOUND));
+    }
+
+    public BillDTO checkBillToPay(BillDTO billDTO){
+        BillDTO billDTOChecked = new BillDTO();
+        billDTOChecked.setMenus(billDTO.getMenus());
+        billDTOChecked.setQuantities(billDTO.getMenus().size());
+        billDTOChecked.setTotalPrice(billDTO.getMenus().stream().mapToDouble(MenuDTO::getPrice).sum());
+        return billDTOChecked;
     }
 }
