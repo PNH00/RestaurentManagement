@@ -33,20 +33,20 @@ public class BillService {
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     RMConstant.BILL_BAD_REQUEST));
         }
-        try {
-            List<Menu> menus = new ArrayList<>();
-            for (MenuDTO menuDTO : billDTO.getMenus()) {
-                Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
-                if (menuSearch!=null) {
-                    menus.add(menuSearch);
-                } else {
-                    throw new RMValidateException(new ErrorResponse(
-                            new Date().toString(),
-                            HttpStatus.NOT_FOUND.value(),
-                            HttpStatus.NOT_FOUND.getReasonPhrase(),
-                            RMConstant.MENU_NOT_FOUND));
-                }
+        List<Menu> menus = new ArrayList<>();
+        for (MenuDTO menuDTO : billDTO.getMenus()) {
+            Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+            if (menuSearch!=null) {
+                menus.add(menuSearch);
+            } else {
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        RMConstant.MENU_NOT_FOUND));
             }
+        }
+        try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setMenus(menus);
             bill.setQuantities(menus.size());
@@ -68,7 +68,6 @@ public class BillService {
         List<BillDTO> billDTOs = new ArrayList<BillDTO>();
         for (Bill bill: billRepository.findAll()) {
             billDTOs.add(BillMapper.billToBillDTOMapper(bill));
-            System.out.println(bill.getId());
         }
         return billDTOs;
     }
@@ -99,20 +98,20 @@ public class BillService {
                         RMConstant.BILL_BAD_REQUEST));
             }
         }
-        try {
-            List<Menu> menus = new ArrayList<>();
-            for (MenuDTO menuDTO : billDTO.getMenus()) {
-                Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
-                if (menuSearch!=null) {
-                    menus.add(menuSearch);
-                } else {
-                    throw new RMValidateException(new ErrorResponse(
-                            new Date().toString(),
-                            HttpStatus.NOT_FOUND.value(),
-                            HttpStatus.NOT_FOUND.getReasonPhrase(),
-                            RMConstant.MENU_NOT_FOUND));
-                }
+        List<Menu> menus = new ArrayList<>();
+        for (MenuDTO menuDTO : billDTO.getMenus()) {
+            Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+            if (menuSearch!=null) {
+                menus.add(menuSearch);
+            } else {
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        RMConstant.MENU_NOT_FOUND));
             }
+        }
+        try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setId(id);
             bill.setMenus(menus);

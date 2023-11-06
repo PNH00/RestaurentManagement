@@ -37,14 +37,7 @@ public class BillController {
                 HttpStatus.OK.getReasonPhrase(),
                 "Get bills successfully!",
                 billDTOs);
-        SuccessResponse  successResponseNotFound = new SuccessResponse(
-                HttpStatus.OK.value(),
-                HttpStatus.OK.getReasonPhrase(),
-                "Get bills successfully!",
-                "No data found here!");
-        return billDTOs.isEmpty()?
-                new ResponseEntity<>(successResponseNotFound, HttpStatus.OK):
-                new ResponseEntity<>(successResponse, HttpStatus.OK);
+        return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
