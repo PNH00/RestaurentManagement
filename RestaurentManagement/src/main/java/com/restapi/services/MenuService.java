@@ -36,6 +36,13 @@ public class MenuService {
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     RMConstant.TYPE_BAD_REQUEST));
         }
+        if (menu.getPrice()<0){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Price cannot less than 0!"));
+        }
         List<Type> types = typeService.saveAllType(menu.getType());
         Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
         menuToCreate.setType(types);
@@ -150,7 +157,7 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         }
-        return MenuMapper.convertToMenuDTOList(new ArrayList<>(uniqueMenus));
+        return MenuMapper.menuToMenuDTOMapper(new ArrayList<>(uniqueMenus));
     }
     public Menu searchMenusByName(String name) {
         if (name==null){
@@ -163,11 +170,7 @@ public class MenuService {
         List<Menu> menusByName = menuRepository.findByNameEquals(name);
         Set<Menu> uniqueMenus = new HashSet<>(menusByName);
         if (uniqueMenus.isEmpty()){
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.NOT_FOUND.value(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
-                    RMConstant.MENU_NOT_FOUND));
+            return null;
         }
         return new ArrayList<>(uniqueMenus).get(0);
     }

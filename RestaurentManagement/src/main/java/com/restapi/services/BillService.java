@@ -3,6 +3,7 @@ package com.restapi.services;
 import com.restapi.constants.RMConstant;
 import com.restapi.dto.BillDTO;
 import com.restapi.dto.MenuDTO;
+import com.restapi.enums.PaymentStatus;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.mapper.BillMapper;
 import com.restapi.models.Bill;
@@ -32,25 +33,28 @@ public class BillService {
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     RMConstant.BILL_BAD_REQUEST));
         }
-        try {
-            List<Menu> menus = new ArrayList<>();
-            for (MenuDTO menuDTO : billDTO.getMenus()) {
-                Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
-                if (menuSearch!=null) {
-                    menus.add(menuSearch);
-                } else {
-                    throw new RMValidateException(new ErrorResponse(
-                            new Date().toString(),
-                            HttpStatus.NOT_FOUND.value(),
-                            HttpStatus.NOT_FOUND.getReasonPhrase(),
-                            RMConstant.MENU_NOT_FOUND));
-                }
+        List<Menu> menus = new ArrayList<>();
+        for (MenuDTO menuDTO : billDTO.getMenus()) {
+            Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+            if (menuSearch!=null) {
+                menus.add(menuSearch);
+            } else {
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        RMConstant.MENU_NOT_FOUND));
             }
+        }
+        try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setMenus(menus);
             bill.setQuantities(menus.size());
+            bill.setTotalPrice(menus.stream().mapToDouble(Menu::getPrice).sum());
+            bill.setPaymentStatus(PaymentStatus.UNPAID);
+            bill.setCreateDate(new Date());
             billRepository.save(bill);
-            return billDTO;
+            return BillMapper.billToBillDTOMapper(bill);
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -94,27 +98,34 @@ public class BillService {
                         RMConstant.BILL_BAD_REQUEST));
             }
         }
-        try {
-            List<Menu> menus = new ArrayList<>();
-            for (MenuDTO menuDTO : billDTO.getMenus()) {
-                Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
-                if (menuSearch!=null) {
-                    menus.add(menuSearch);
-                } else {
-                    throw new RMValidateException(new ErrorResponse(
-                            new Date().toString(),
-                            HttpStatus.NOT_FOUND.value(),
-                            HttpStatus.NOT_FOUND.getReasonPhrase(),
-                            RMConstant.MENU_NOT_FOUND));
-                }
+        List<Menu> menus = new ArrayList<>();
+        for (MenuDTO menuDTO : billDTO.getMenus()) {
+            Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+            if (menuSearch!=null) {
+                menus.add(menuSearch);
+            } else {
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        RMConstant.MENU_NOT_FOUND));
             }
+        }
+        try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setId(id);
             bill.setMenus(menus);
             bill.setQuantities(menus.size());
-            bill.setTotalPrice(bill.getTotalPrice());
+            bill.setTotalPrice(menus.stream().mapToDouble(Menu::getPrice).sum());
+            bill.setCreateDate(new Date());
+            if (billDTO.getPaymentStatus()!=null){
+                bill.setPaymentStatus(PaymentStatus.PAID);
+            }
+            else {
+                bill.setPaymentStatus(PaymentStatus.UNPAID);
+            }
             billRepository.save(bill);
-            return billDTO;
+            return BillMapper.billToBillDTOMapper(bill);
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -125,8 +136,31 @@ public class BillService {
     }
 
     public void deleteBill(UUID id) {
-        if(billRepository.existsById(id))
-            billRepository.deleteById(id);
+        Date realDate = new Date();
+        for (Bill bill:billRepository.findAll()) {
+            if (bill.getPaymentStatus()==PaymentStatus.PAID){
+                Calendar calendarCreateDate = Calendar.getInstance();
+                calendarCreateDate.setTime(bill.getCreateDate());
+                Calendar calendarRealDate = Calendar.getInstance();
+                calendarRealDate.setTime(realDate);
+                calendarCreateDate.add(Calendar.DAY_OF_MONTH, 30);
+                if (calendarRealDate.equals(calendarCreateDate)|| calendarRealDate.after(calendarCreateDate)){
+                    billRepository.deleteById(id);
+                }
+            }
+        }
+        if(billRepository.findById(id).isPresent()){
+            if (billRepository.findById(id).get().getPaymentStatus()==PaymentStatus.UNPAID){
+                billRepository.deleteById(id);
+            }
+            else {
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.BILL_HAD_PAID));
+            }
+        }
         else
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
