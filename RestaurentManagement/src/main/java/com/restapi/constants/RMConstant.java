@@ -11,4 +11,5 @@ public class RMConstant {
     public static final String BILL_INTERNAL_SERVER_ERROR = "Have some bill use this menu!";
     public static final String BILL_NOT_FOUND = "The bill not found!" ;
     public static final String NAME_EXISTED = "The menu's name had exist";
+    public static final String BILL_HAD_PAID = "The bill had paid";
 }

@@ -157,7 +157,7 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         }
-        return MenuMapper.convertToMenuDTOList(new ArrayList<>(uniqueMenus));
+        return MenuMapper.menuToMenuDTOMapper(new ArrayList<>(uniqueMenus));
     }
     public Menu searchMenusByName(String name) {
         if (name==null){
@@ -170,11 +170,7 @@ public class MenuService {
         List<Menu> menusByName = menuRepository.findByNameEquals(name);
         Set<Menu> uniqueMenus = new HashSet<>(menusByName);
         if (uniqueMenus.isEmpty()){
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.NOT_FOUND.value(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
-                    RMConstant.MENU_NOT_FOUND));
+            return null;
         }
         return new ArrayList<>(uniqueMenus).get(0);
     }

@@ -31,12 +31,4 @@ public class MenuMapper {
         menu.setDescription(menuDTO.getDescription());
         return menu;
     }
-
-    public static List<MenuDTO> convertToMenuDTOList(List<Menu> menus) {
-        List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
-        for (Menu menu : menus) {
-            menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
-        }
-        return menuDTOs;
-    }
 }

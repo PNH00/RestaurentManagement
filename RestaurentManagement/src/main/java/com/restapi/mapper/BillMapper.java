@@ -16,7 +16,9 @@ public class BillMapper {
         return new BillDTO(
                 menuDTOs,
                 bill.getQuantities(),
-                bill.getTotalPrice());
+                bill.getTotalPrice(),
+                bill.getPaymentStatus(),
+                bill.getCreateDate());
     }
     public static Bill billDTOToBillMapper(BillDTO billDTO){
         List<Menu> menus = new ArrayList<Menu>();
@@ -28,5 +30,12 @@ public class BillMapper {
         bill.setTotalPrice(billDTO.getTotalPrice());
         bill.setMenus(menus);
         return bill;
+    }
+    public static List<Bill> billDTOToBillMapper(List<BillDTO> billDTOs){
+        List<Bill> bills = new ArrayList<Bill>();
+        for (BillDTO billDTO: billDTOs) {
+            bills.add(billDTOToBillMapper(billDTO));
+        }
+        return bills;
     }
 }
