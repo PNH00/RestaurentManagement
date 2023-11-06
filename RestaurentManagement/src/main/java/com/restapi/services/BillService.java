@@ -35,7 +35,7 @@ public class BillService {
         }
         List<Menu> menus = new ArrayList<>();
         for (MenuDTO menuDTO : billDTO.getMenus()) {
-            Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+            Menu menuSearch = menuService.searchMenuByName(menuDTO.getName());
             if (menuSearch!=null) {
                 menus.add(menuSearch);
             } else {
@@ -100,7 +100,7 @@ public class BillService {
         }
         List<Menu> menus = new ArrayList<>();
         for (MenuDTO menuDTO : billDTO.getMenus()) {
-            Menu menuSearch = menuService.searchMenusByName(menuDTO.getName());
+            Menu menuSearch = menuService.searchMenuByName(menuDTO.getName());
             if (menuSearch!=null) {
                 menus.add(menuSearch);
             } else {
