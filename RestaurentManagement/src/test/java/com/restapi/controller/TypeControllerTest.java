@@ -1,4 +1,4 @@
-package com.restapi.testcontroller;
+package com.restapi.controller;
 
 import com.restapi.controllers.TypeController;
 import com.restapi.dto.TypeDTO;

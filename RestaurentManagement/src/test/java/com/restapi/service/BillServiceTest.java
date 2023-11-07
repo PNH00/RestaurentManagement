@@ -1,4 +1,4 @@
-package com.restapi.testservice;
+package com.restapi.service;
 
 import com.restapi.constants.RMConstant;
 import com.restapi.dto.BillDTO;
