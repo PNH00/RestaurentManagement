@@ -46,7 +46,7 @@ public class MenuService {
         List<Type> types = typeService.saveAllType(menu.getType());
         Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
         menuToCreate.setType(types);
-        if(searchMenusByName(menuToCreate.getName())!=null){
+        if(searchMenuByName(menuToCreate.getName())!=null){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -159,7 +159,7 @@ public class MenuService {
         }
         return MenuMapper.menuToMenuDTOMapper(new ArrayList<>(uniqueMenus));
     }
-    public Menu searchMenusByName(String name) {
+    public Menu searchMenuByName(String name) {
         if (name==null){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
