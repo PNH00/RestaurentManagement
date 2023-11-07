@@ -1,4 +1,4 @@
-package com.restapi.tests;
+package com.restapi.testservice;
 
 import com.restapi.dto.MenuDTO;
 import com.restapi.dto.TypeDTO;
@@ -33,14 +33,14 @@ class MenuServiceTest {
     }
 
     @Test
-    void createMenu_ShouldThrowException_WhenTypeIsEmpty() {
+    void createMenuShouldThrowExceptionWhenTypeIsEmpty() {
         MenuDTO menuDTO = new MenuDTO();
         menuDTO.setType(Collections.emptyList());
         assertThrows(RMValidateException.class, () -> menuService.createMenu(menuDTO));
     }
 
     @Test
-    void createMenu_ShouldThrowException_WhenPriceIsNegative() {
+    void createMenuShouldThrowExceptionWhenPriceIsNegative() {
         MenuDTO menuDTO = new MenuDTO();
         menuDTO.setType(List.of(new TypeDTO("Type1")));
         menuDTO.setPrice(-10);
@@ -48,7 +48,7 @@ class MenuServiceTest {
     }
 
     @Test
-    void createMenu_ShouldThrowException_WhenMenuNameExists() {
+    void createMenuShouldThrowExceptionWhenMenuNameExists() {
         MenuDTO menuDTO = new MenuDTO();
         menuDTO.setType(List.of(new TypeDTO("Type1")));
         menuDTO.setName("ExistingMenu");
@@ -58,14 +58,14 @@ class MenuServiceTest {
     }
 
     @Test
-    void getMenuById_ShouldThrowException_WhenMenuNotFound() {
+    void getMenuByIdShouldThrowExceptionWhenMenuNotFound() {
         UUID id = UUID.randomUUID();
         when(menuRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(RMValidateException.class, () -> menuService.getMenuById(id));
     }
 
     @Test
-    void updateMenu_ShouldThrowException_WhenMenuNotFound() {
+    void updateMenuShouldThrowExceptionWhenMenuNotFound() {
         UUID id = UUID.randomUUID();
         MenuDTO menuDTO = new MenuDTO();
         menuDTO.setType(List.of(new TypeDTO("Type1")));
@@ -74,7 +74,7 @@ class MenuServiceTest {
     }
 
     @Test
-    void updateMenu_ShouldUpdateMenu_WhenMenuFound() {
+    void updateMenuShouldUpdateMenuWhenMenuFound() {
         UUID id = UUID.randomUUID();
         MenuDTO menuDTO = new MenuDTO();
         menuDTO.setType(List.of(new TypeDTO("Type1")));
@@ -89,7 +89,7 @@ class MenuServiceTest {
     }
 
     @Test
-    void deleteMenu_ShouldThrowException_WhenMenuNotFound() {
+    void deleteMenuShouldThrowExceptionWhenMenuNotFound() {
         UUID id = UUID.randomUUID();
 
         when(menuRepository.existsById(id)).thenReturn(false);
@@ -97,7 +97,7 @@ class MenuServiceTest {
     }
 
     @Test
-    void deleteMenu_ShouldDeleteMenu_WhenMenuFound() {
+    void deleteMenuShouldDeleteMenuWhenMenuFound() {
         UUID id = UUID.randomUUID();
 
         when(menuRepository.existsById(id)).thenReturn(true);
@@ -105,19 +105,19 @@ class MenuServiceTest {
     }
 
     @Test
-    void searchMenus_ShouldThrowException_WhenKeywordIsNull() {
+    void searchMenusShouldThrowExceptionWhenKeywordIsNull() {
         String keyword = null;
         assertThrows(RMValidateException.class, () -> menuService.searchMenus(keyword));
     }
 
     @Test
-    void searchMenuByName_ShouldThrowException_WhenNameIsNull() {
+    void searchMenuByNameShouldThrowExceptionWhenNameIsNull() {
         String name = null;
         assertThrows(RMValidateException.class, () -> menuService.searchMenuByName(name));
     }
 
     @Test
-    void searchMenuByName_ShouldReturnMenu_WhenMenuFound() {
+    void searchMenuByNameShouldReturnMenuWhenMenuFound() {
         String name = "TestMenu";
         Menu menu = new Menu();
         menu.setName(name);

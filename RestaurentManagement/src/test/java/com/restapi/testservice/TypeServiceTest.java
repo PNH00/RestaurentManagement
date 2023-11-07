@@ -1,4 +1,4 @@
-package com.restapi.tests;
+package com.restapi.testservice;
 
 import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.RMValidateException;
@@ -36,7 +36,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void getTypeById_WhenTypeExists_ShouldReturnTypeDTO() {
+    void getTypeByIdWhenTypeExistsShouldReturnTypeDTO() {
         UUID id = UUID.randomUUID();
         Type type = new Type();
         when(typeRepository.findById(id)).thenReturn(Optional.of(type));
@@ -45,7 +45,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void getTypeById_WhenTypeNotFound_ShouldThrowException() {
+    void getTypeByIdWhenTypeNotFoundShouldThrowException() {
         UUID id = UUID.randomUUID();
         when(typeRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(RMValidateException.class, () -> typeService.getTypeById(id));
@@ -68,7 +68,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void updateType_WhenTypeNotFound_ShouldThrowException() {
+    void updateTypeWhenTypeNotFoundShouldThrowException() {
         UUID id = UUID.randomUUID();
         TypeDTO typeDTO = new TypeDTO();
         when(typeRepository.existsById(id)).thenReturn(false);
@@ -76,7 +76,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void deleteType_WhenTypeExists_ShouldDeleteType() {
+    void deleteTypeWhenTypeExistsShouldDeleteType() {
         UUID id = UUID.randomUUID();
         when(typeRepository.existsById(id)).thenReturn(true);
         typeService.deleteType(id);
@@ -84,7 +84,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void deleteType_WhenTypeNotFound_ShouldThrowException() {
+    void deleteTypeWhenTypeNotFoundShouldThrowException() {
         UUID id = UUID.randomUUID();
         when(typeRepository.existsById(id)).thenReturn(false);
         assertThrows(RMValidateException.class, () -> typeService.deleteType(id));

@@ -1,4 +1,4 @@
-package com.restapi.tests;
+package com.restapi.testservice;
 
 import com.restapi.constants.RMConstant;
 import com.restapi.dto.BillDTO;
@@ -34,7 +34,7 @@ class BillServiceTest {
     }
 
     @Test
-    void createBill_ShouldThrowException_WhenMenusIsEmpty() {
+    void createBillShouldThrowExceptionWhenMenusIsEmpty() {
         BillDTO billDTO = new BillDTO();
         billDTO.setMenus(Collections.emptyList());
         RMValidateException exception = assertThrows(RMValidateException.class, () -> billService.createBill(billDTO));
@@ -42,7 +42,7 @@ class BillServiceTest {
     }
 
     @Test
-    void createBill_ShouldThrowException_WhenMenuNotFound() {
+    void createBillShouldThrowExceptionWhenMenuNotFound() {
         BillDTO billDTO = new BillDTO();
         MenuDTO menuDTO = new MenuDTO();
         menuDTO.setName("NonExistentMenu");
@@ -53,7 +53,7 @@ class BillServiceTest {
     }
 
     @Test
-    void updateBill_ShouldThrowException_WhenBillNotFound() {
+    void updateBillShouldThrowExceptionWhenBillNotFound() {
         UUID id = UUID.randomUUID();
         BillDTO billDTO = new BillDTO();
 
@@ -64,7 +64,7 @@ class BillServiceTest {
     }
 
     @Test
-    void deleteBill_ShouldThrowException_WhenBillNotFound() {
+    void deleteBillShouldThrowExceptionWhenBillNotFound() {
         UUID id = UUID.randomUUID();
         when(billRepository.findById(id)).thenReturn(Optional.empty());
         RMValidateException exception = assertThrows(RMValidateException.class, () -> billService.deleteBill(id));
@@ -72,7 +72,7 @@ class BillServiceTest {
     }
 
     @Test
-    void deleteBill_ShouldThrowException_WhenBillIsPaidAndNotExpired() {
+    void deleteBillShouldThrowExceptionWhenBillIsPaidAndNotExpired() {
         UUID id = UUID.randomUUID();
         Bill bill = new Bill();
         bill.setPaymentStatus(PaymentStatus.PAID);
