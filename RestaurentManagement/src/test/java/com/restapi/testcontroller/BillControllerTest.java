@@ -1,4 +1,4 @@
-package com.restapi.testapi;
+package com.restapi.testcontroller;
 
 import com.restapi.controllers.BillController;
 import com.restapi.dto.BillDTO;

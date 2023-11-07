@@ -1,4 +1,4 @@
-package com.restapi.testapi;
+package com.restapi.testcontroller;
 
 import com.restapi.controllers.MenuController;
 import com.restapi.dto.MenuDTO;
