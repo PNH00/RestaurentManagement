@@ -11,9 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +38,7 @@ class TypeControllerTest {
         successResponse.setMessage("Get types successfully!");
         successResponse.setStatus(HttpStatus.OK.getReasonPhrase());
         assertEquals(successResponse,typeController.getAllTypes().getBody());
+        verify(typeService,times(1)).getAllTypes();
     }
 
     @Test
@@ -47,6 +46,7 @@ class TypeControllerTest {
         UUID id = UUID.randomUUID();
         when(typeService.getTypeById(id)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,()->typeController.getTypeById(id));
+        verify(typeService,times(1)).getTypeById(id);
     }
 
     @Test
@@ -55,6 +55,7 @@ class TypeControllerTest {
         TypeDTO typeDTO = new TypeDTO("hot");
         when(typeService.getTypeById(id)).thenReturn(typeDTO);
         assertEquals(typeDTO, Objects.requireNonNull(typeController.getTypeById(id).getBody()).getData());
+        verify(typeService,times(1)).getTypeById(id);
     }
 
     @Test
@@ -62,6 +63,7 @@ class TypeControllerTest {
         TypeDTO typeDTO = new TypeDTO("hot");
         when(typeService.createType(typeDTO)).thenReturn(typeDTO);
         assertEquals(typeDTO, Objects.requireNonNull(typeController.createType(typeDTO).getBody()).getData());
+        verify(typeService,times(1)).createType(typeDTO);
     }
 
     @Test
@@ -70,6 +72,7 @@ class TypeControllerTest {
         TypeDTO typeDTO = new TypeDTO();
         when(typeService.updateType(uuid,typeDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,()->typeController.updateType(uuid,typeDTO));
+        verify(typeService,times(1)).updateType(uuid,typeDTO);
     }
 
     @Test
@@ -78,6 +81,7 @@ class TypeControllerTest {
         TypeDTO typeDTO = new TypeDTO("hot");
         when(typeService.updateType(uuid,typeDTO)).thenReturn(typeDTO);
         assertEquals(SuccessResponse.class, Objects.requireNonNull(typeController.updateType(uuid, typeDTO).getBody()).getClass());
+        verify(typeService,times(1)).updateType(uuid,typeDTO);
     }
 
     @Test
@@ -86,6 +90,7 @@ class TypeControllerTest {
         TypeDTO typeDTO = new TypeDTO("hot");
         when(typeService.updateType(uuid,typeDTO)).thenReturn(typeDTO);
         assertEquals(typeDTO, Objects.requireNonNull(typeController.updateType(uuid, typeDTO).getBody()).getData());
+        verify(typeService,times(1)).updateType(uuid,typeDTO);
     }
 
     @Test
@@ -93,6 +98,7 @@ class TypeControllerTest {
         UUID uuid = UUID.randomUUID();
         doThrow(RMValidateException.class).when(typeService).deleteType(uuid);
         assertThrows(RMValidateException.class,()->typeController.deleteType(uuid));
+        verify(typeService,times(1)).deleteType(uuid);
     }
 
     @Test
@@ -100,40 +106,6 @@ class TypeControllerTest {
         UUID uuid = UUID.randomUUID();
         doNothing().when(typeService).deleteType(uuid);
         assertEquals(SuccessResponse.class, Objects.requireNonNull(typeController.deleteType(uuid).getBody()).getClass());
-    }
-
-    @Test
-    void testApiCreateTypeShouldBeCalledOnce() {
-        TypeDTO typeDTO = new TypeDTO("hot");
-        typeController.createType(typeDTO);
-        verify(typeService,times(1)).createType(typeDTO);
-    }
-
-    @Test
-    void testApiGetAllTypesShouldBeCalledOnce() {
-        typeController.getAllTypes();
-        verify(typeService,times(1)).getAllTypes();
-    }
-
-    @Test
-    void testApiGetTypeByIdShouldBeCalledOnce() {
-        UUID uuid = UUID.randomUUID();
-        typeController.getTypeById(uuid);
-        verify(typeService,times(1)).getTypeById(uuid);
-    }
-
-    @Test
-    void testApiUpdateTypeShouldBeCalledOnce() {
-        TypeDTO typeDTO = new TypeDTO("hot");
-        UUID uuid = UUID.randomUUID();
-        typeController.updateType(uuid,typeDTO);
-        verify(typeService,times(1)).updateType(uuid,typeDTO);
-    }
-
-    @Test
-    void testApiDeleteTypeShouldBeCalledOnce() {
-        UUID uuid = UUID.randomUUID();
-        typeController.deleteType(uuid);
         verify(typeService,times(1)).deleteType(uuid);
     }
 }

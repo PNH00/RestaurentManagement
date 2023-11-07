@@ -44,6 +44,7 @@ class BillControllerTest {
         successResponse.setMessage("Get bills successfully!");
         successResponse.setStatus(HttpStatus.OK.getReasonPhrase());
         assertEquals(successResponse,billController.getAllBills().getBody());
+        verify(billService,times(1)).getAllBills();
     }
 
     @Test
@@ -51,6 +52,7 @@ class BillControllerTest {
         UUID id = UUID.randomUUID();
         when(billService.getBillById(id)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,()->billController.getBillById(id));
+        verify(billService,times(1)).getBillById(id);
     }
 
     @Test
@@ -63,6 +65,7 @@ class BillControllerTest {
         billDTO.setMenus(List.of(menuDTO));
         when(billService.getBillById(id)).thenReturn(billDTO);
         assertEquals(billDTO, Objects.requireNonNull(billController.getBillById(id).getBody()).getData());
+        verify(billService,times(1)).getBillById(id);
     }
 
     @Test
@@ -74,6 +77,7 @@ class BillControllerTest {
         billDTO.setMenus(List.of(menuDTO));
         when(billService.createBill(billDTO)).thenReturn(billDTO);
         assertEquals(billDTO, Objects.requireNonNull(billController.createBill(billDTO).getBody()).getData());
+        verify(billService,times(1)).createBill(billDTO);
     }
 
     @Test
@@ -82,6 +86,7 @@ class BillControllerTest {
         billDTO.setMenus(new ArrayList<>());
         when(billService.createBill(billDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class, ()->billController.createBill(billDTO));
+        verify(billService,times(1)).createBill(billDTO);
     }
 
     @Test
@@ -90,6 +95,7 @@ class BillControllerTest {
         BillDTO billDTO = new BillDTO();
         when(billService.updateBill(uuid,billDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,()->billController.updateBill(uuid,billDTO));
+        verify(billService,times(1)).updateBill(uuid,billDTO);
     }
 
     @Test
@@ -102,6 +108,7 @@ class BillControllerTest {
         billDTO.setMenus(List.of(menuDTO));
         when(billService.updateBill(uuid,billDTO)).thenReturn(billDTO);
         assertEquals(SuccessResponse.class, Objects.requireNonNull(billController.updateBill(uuid, billDTO).getBody()).getClass());
+        verify(billService,times(1)).updateBill(uuid,billDTO);
     }
 
     @Test
@@ -114,6 +121,7 @@ class BillControllerTest {
         billDTO.setMenus(List.of(menuDTO));
         when(billService.updateBill(uuid,billDTO)).thenReturn(billDTO);
         assertEquals(billDTO, Objects.requireNonNull(billController.updateBill(uuid, billDTO).getBody()).getData());
+        verify(billService,times(1)).updateBill(uuid,billDTO);
     }
 
     @Test
@@ -123,6 +131,7 @@ class BillControllerTest {
         billDTO.setMenus(new ArrayList<>());
         when(billService.updateBill(uuid,billDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class, ()->billController.updateBill(uuid,billDTO));
+        verify(billService,times(1)).updateBill(uuid,billDTO);
     }
 
     @Test
@@ -130,6 +139,7 @@ class BillControllerTest {
         UUID uuid = UUID.randomUUID();
         doThrow(RMValidateException.class).when(billService).deleteBill(uuid);
         assertThrows(RMValidateException.class,()->billController.deleteBill(uuid));
+        verify(billService,times(1)).deleteBill(uuid);
     }
 
     @Test
@@ -137,6 +147,7 @@ class BillControllerTest {
         UUID uuid = UUID.randomUUID();
         doNothing().when(billService).deleteBill(uuid);
         assertEquals(SuccessResponse.class, Objects.requireNonNull(billController.deleteBill(uuid).getBody()).getClass());
+        verify(billService,times(1)).deleteBill(uuid);
     }
 
     @Test
@@ -147,49 +158,6 @@ class BillControllerTest {
         bill.setPaymentStatus(PaymentStatus.PAID);
         doThrow(RMValidateException.class).when(billService).deleteBill(uuid);
         assertThrows(RMValidateException.class,()->billController.deleteBill(uuid));
-    }
-
-    @Test
-    void testApiCreateBillShouldBeCalledOnce() {
-        MenuDTO menuDTO  = new MenuDTO("Menu 4", "ice cream",
-                "URL", 10.99,
-                List.of(new TypeDTO("apple"),new TypeDTO("orange")));
-        BillDTO billDTO = new BillDTO();
-        billDTO.setMenus(List.of(menuDTO));
-        billController.createBill(billDTO);
-        verify(billService,times(1)).createBill(billDTO);
-    }
-
-    @Test
-    void testApiGetAllBillsShouldBeCalledOnce() {
-        billController.getAllBills();
-        verify(billService,times(1)).getAllBills();
-    }
-
-    @Test
-    void testApiGetBillByIdShouldBeCalledOnce() {
-        UUID uuid = UUID.randomUUID();
-        billController.getBillById(uuid);
-        verify(billService,times(1)).getBillById(uuid);
-    }
-
-    @Test
-    void testApiUpdateBillShouldBeCalledOnce() {
-        MenuDTO menuDTO  = new MenuDTO("Menu 4", "ice cream",
-                "URL", 10.99,
-                List.of(new TypeDTO("apple"),new TypeDTO("orange")));
-        BillDTO billDTO = new BillDTO();
-        billDTO.setMenus(List.of(menuDTO));
-        UUID uuid = UUID.randomUUID();
-        billController.updateBill(uuid,billDTO);
-        verify(billService,times(1)).updateBill(uuid,billDTO);
-    }
-
-    @Test
-    void testApiDeleteBillShouldBeCalledOnce() {
-        UUID uuid = UUID.randomUUID();
-        billController.deleteBill(uuid);
         verify(billService,times(1)).deleteBill(uuid);
     }
-
 }

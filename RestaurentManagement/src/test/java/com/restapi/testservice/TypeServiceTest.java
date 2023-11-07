@@ -28,7 +28,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void getAllTypes() {
+    void getAllTypesWhenSuccessShouldReturnSuccessResponse() {
         List<Type> types = Arrays.asList(new Type(), new Type());
         when(typeRepository.findAll()).thenReturn(types);
         List<TypeDTO> result = typeService.getAllTypes();
@@ -52,7 +52,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void createType() {
+    void createTypeWhenSuccessShouldReturnTypeDTO() {
         TypeDTO typeDTO = new TypeDTO();
         typeDTO.setType("SomeType");
         TypeDTO result = typeService.createType(typeDTO);
@@ -61,7 +61,7 @@ class TypeServiceTest {
     }
 
     @Test
-    void saveAllType() {
+    void saveAllTypeWhenSuccessShouldReturnListOfTypeDTO() {
         List<TypeDTO> typeDTOs = Arrays.asList(new TypeDTO(), new TypeDTO());
         List<Type> result = typeService.saveAllType(typeDTOs);
         assertEquals(typeDTOs.size(), result.size());

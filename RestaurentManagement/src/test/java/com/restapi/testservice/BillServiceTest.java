@@ -34,7 +34,7 @@ class BillServiceTest {
     }
 
     @Test
-    void createBillShouldThrowExceptionWhenMenusIsEmpty() {
+    void createBillWhenMenusIsEmptyShouldThrowException() {
         BillDTO billDTO = new BillDTO();
         billDTO.setMenus(Collections.emptyList());
         RMValidateException exception = assertThrows(RMValidateException.class, () -> billService.createBill(billDTO));
@@ -42,7 +42,7 @@ class BillServiceTest {
     }
 
     @Test
-    void createBillShouldThrowExceptionWhenMenuNotFound() {
+    void createBillWhenMenuNotFoundShouldThrowException() {
         BillDTO billDTO = new BillDTO();
         MenuDTO menuDTO = new MenuDTO();
         menuDTO.setName("NonExistentMenu");
@@ -53,7 +53,7 @@ class BillServiceTest {
     }
 
     @Test
-    void updateBillShouldThrowExceptionWhenBillNotFound() {
+    void updateBillWhenBillNotFoundShouldThrowException() {
         UUID id = UUID.randomUUID();
         BillDTO billDTO = new BillDTO();
 
@@ -64,7 +64,7 @@ class BillServiceTest {
     }
 
     @Test
-    void deleteBillShouldThrowExceptionWhenBillNotFound() {
+    void deleteBillWhenBillNotFoundShouldThrowException() {
         UUID id = UUID.randomUUID();
         when(billRepository.findById(id)).thenReturn(Optional.empty());
         RMValidateException exception = assertThrows(RMValidateException.class, () -> billService.deleteBill(id));
@@ -72,7 +72,7 @@ class BillServiceTest {
     }
 
     @Test
-    void deleteBillShouldThrowExceptionWhenBillIsPaidAndNotExpired() {
+    void deleteBillWhenBillIsPaidAndNotExpiredShouldThrowException() {
         UUID id = UUID.randomUUID();
         Bill bill = new Bill();
         bill.setPaymentStatus(PaymentStatus.PAID);

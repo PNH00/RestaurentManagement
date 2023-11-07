@@ -38,6 +38,7 @@ class MenuControllerTest {
         successResponse.setMessage("Get menus successfully!");
         successResponse.setStatus(HttpStatus.OK.getReasonPhrase());
         assertEquals(successResponse,menuController.getAllMenusPaged(1,10,"id","asc").getBody());
+        verify(menuService,times(1)).getAllMenusPaged(1,10,"id","asc");
     }
 
     @Test
@@ -45,6 +46,7 @@ class MenuControllerTest {
         UUID id = UUID.randomUUID();
         when(menuService.getMenuById(id)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,()->menuController.getMenuById(id));
+        verify(menuService,times(1)).getMenuById(id);
     }
 
     @Test
@@ -55,6 +57,7 @@ class MenuControllerTest {
                 List.of(new TypeDTO("apple"),new TypeDTO("orange")));
         when(menuService.getMenuById(id)).thenReturn(menuDTO);
         assertEquals(menuDTO, Objects.requireNonNull(menuController.getMenuById(id).getBody()).getData());
+        verify(menuService,times(1)).getMenuById(id);
     }
 
     @Test
@@ -64,6 +67,7 @@ class MenuControllerTest {
                  List.of(new TypeDTO("apple"),new TypeDTO("orange")));
         when(menuService.createMenu(menuDTO)).thenReturn(menuDTO);
         assertEquals(menuDTO, Objects.requireNonNull(menuController.createMenu(menuDTO).getBody()).getData());
+        verify(menuService,times(1)).createMenu(menuDTO);
     }
 
     @Test
@@ -73,6 +77,7 @@ class MenuControllerTest {
                 new ArrayList<>());
         when(menuService.createMenu(menuDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class, ()->menuController.createMenu(menuDTO));
+        verify(menuService,times(1)).createMenu(menuDTO);
     }
 
     @Test
@@ -82,6 +87,7 @@ class MenuControllerTest {
                 List.of(new TypeDTO("apple"),new TypeDTO("orange")));
         when(menuService.createMenu(menuDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,() -> menuController.createMenu(menuDTO));
+        verify(menuService,times(1)).createMenu(menuDTO);
     }
 
     @Test
@@ -94,6 +100,7 @@ class MenuControllerTest {
         when(menuService.searchMenuByName(menuDTO.getName())).thenReturn(MenuMapper.menuDTOToMenuMapper(menuDTO));
         when(menuService.createMenu(menuDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,() -> menuController.createMenu(menuDTO));
+        verify(menuService,times(1)).createMenu(menuDTO);
     }
 
     @Test
@@ -102,6 +109,7 @@ class MenuControllerTest {
         MenuDTO menuDTO = new MenuDTO();
         when(menuService.updateMenu(uuid,menuDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,()->menuController.updateMenu(uuid,menuDTO));
+        verify(menuService,times(1)).updateMenu(uuid,menuDTO);
     }
 
     @Test
@@ -112,6 +120,7 @@ class MenuControllerTest {
                 List.of(new TypeDTO("apple"),new TypeDTO("orange")));
         when(menuService.updateMenu(uuid,menuDTO)).thenReturn(menuDTO);
         assertEquals(SuccessResponse.class, Objects.requireNonNull(menuController.updateMenu(uuid, menuDTO).getBody()).getClass());
+        verify(menuService,times(1)).updateMenu(uuid,menuDTO);
     }
 
     @Test
@@ -120,6 +129,7 @@ class MenuControllerTest {
         MenuDTO menuDTO = new MenuDTO();
         when(menuService.updateMenu(uuid,menuDTO)).thenReturn(menuDTO);
         assertEquals(menuDTO, Objects.requireNonNull(menuController.updateMenu(uuid, menuDTO).getBody()).getData());
+        verify(menuService,times(1)).updateMenu(uuid,menuDTO);
     }
 
     @Test
@@ -130,6 +140,7 @@ class MenuControllerTest {
                 new ArrayList<>());
         when(menuService.updateMenu(id,menuDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class, ()->menuController.updateMenu(id,menuDTO));
+        verify(menuService,times(1)).updateMenu(id,menuDTO);
     }
 
     @Test
@@ -140,6 +151,7 @@ class MenuControllerTest {
                 List.of(new TypeDTO("apple"),new TypeDTO("orange")));
         when(menuService.updateMenu(id,menuDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,() -> menuController.updateMenu(id,menuDTO));
+        verify(menuService,times(1)).updateMenu(id,menuDTO);
     }
 
     @Test
@@ -153,6 +165,7 @@ class MenuControllerTest {
         when(menuService.searchMenuByName(menuDTO.getName())).thenReturn(MenuMapper.menuDTOToMenuMapper(menuDTO));
         when(menuService.updateMenu(id,menuDTO)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class,() -> menuController.updateMenu(id,menuDTO));
+        verify(menuService,times(1)).updateMenu(id,menuDTO);
     }
 
     @Test
@@ -160,6 +173,7 @@ class MenuControllerTest {
         UUID uuid = UUID.randomUUID();
         doThrow(RMValidateException.class).when(menuService).deleteMenu(uuid);
         assertThrows(RMValidateException.class,()->menuController.deleteMenu(uuid));
+        verify(menuService,times(1)).deleteMenu(uuid);
     }
 
     @Test
@@ -167,6 +181,7 @@ class MenuControllerTest {
         UUID uuid = UUID.randomUUID();
         doNothing().when(menuService).deleteMenu(uuid);
         assertEquals(SuccessResponse.class, Objects.requireNonNull(menuController.deleteMenu(uuid).getBody()).getClass());
+        verify(menuService,times(1)).deleteMenu(uuid);
     }
 
 
@@ -175,6 +190,7 @@ class MenuControllerTest {
         String keyword = "menu 1";
         when(menuService.searchMenus(keyword)).thenReturn(List.of(new MenuDTO()));
         assertEquals(SuccessResponse.class, Objects.requireNonNull(menuController.searchMenus(keyword).getBody()).getClass());
+        verify(menuService,times(1)).searchMenus(keyword);
     }
 
     @Test
@@ -182,6 +198,7 @@ class MenuControllerTest {
         String keyword = "menu 1";
         when(menuService.searchMenus(keyword)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class, ()->menuController.searchMenus(keyword));
+        verify(menuService,times(1)).searchMenus(keyword);
     }
 
     @Test
@@ -189,45 +206,6 @@ class MenuControllerTest {
         String keyword = null;
         when(menuService.searchMenus(keyword)).thenThrow(RMValidateException.class);
         assertThrows(RMValidateException.class, () -> menuController.searchMenus(keyword));
+        verify(menuService,times(1)).searchMenus(keyword);
     }
-
-    @Test
-    void testApiCreateMenuShouldBeCalledOnce() {
-        MenuDTO menuDTO  = new MenuDTO("Menu 4", "ice cream",
-                "URL", 10.99,
-                List.of(new TypeDTO("apple"),new TypeDTO("orange")));
-        menuController.createMenu(menuDTO);
-        verify(menuService,times(1)).createMenu(menuDTO);
-    }
-
-    @Test
-    void testApiGetAllMenusShouldBeCalledOnce() {
-        menuController.getAllMenusPaged(1,10,"id","asc");
-        verify(menuService,times(1)).getAllMenusPaged(1,10,"id","asc");
-    }
-
-    @Test
-    void testApiGetMenuByIdShouldBeCalledOnce() {
-        UUID uuid = UUID.randomUUID();
-        menuController.getMenuById(uuid);
-        verify(menuService,times(1)).getMenuById(uuid);
-    }
-
-    @Test
-    void testApiUpdateMenuShouldBeCalledOnce() {
-        MenuDTO menuDTO  = new MenuDTO("Menu 4", "ice cream",
-                "URL", 10.99,
-                List.of(new TypeDTO("apple"),new TypeDTO("orange")));
-        UUID uuid = UUID.randomUUID();
-        menuController.updateMenu(uuid,menuDTO);
-        verify(menuService,times(1)).updateMenu(uuid,menuDTO);
-    }
-
-    @Test
-    void testApiDeleteMenuShouldBeCalledOnce() {
-        UUID uuid = UUID.randomUUID();
-        menuController.deleteMenu(uuid);
-        verify(menuService,times(1)).deleteMenu(uuid);
-    }
-
 }
