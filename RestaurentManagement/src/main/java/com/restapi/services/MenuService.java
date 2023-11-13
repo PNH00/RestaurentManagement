@@ -68,8 +68,8 @@ public class MenuService {
         }catch (Exception e){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     RMConstant.SOME_THING_WRONG));
         }
     }
@@ -140,8 +140,8 @@ public class MenuService {
             }catch (Exception e){
                 throw new RMValidateException(new ErrorResponse(
                         new Date().toString(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                         RMConstant.SOME_THING_WRONG));
             }
         }
@@ -161,8 +161,8 @@ public class MenuService {
             }catch (Exception e){
                 throw new RMValidateException(new ErrorResponse(
                         new Date().toString(),
-                        HttpStatus.NOT_FOUND.value(),
-                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                         RMConstant.SOME_THING_WRONG));
             }
         }

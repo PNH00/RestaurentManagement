@@ -67,8 +67,8 @@ public class BillService {
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     RMConstant.SOME_THING_WRONG));
         }
     }
@@ -146,8 +146,8 @@ public class BillService {
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                     RMConstant.SOME_THING_WRONG));
         }
     }
