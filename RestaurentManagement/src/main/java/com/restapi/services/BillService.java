@@ -46,6 +46,15 @@ public class BillService {
                         RMConstant.MENU_NOT_FOUND));
             }
         }
+        for (Menu menu:menus) {
+            if(searchBillByMenu(menu)!=null){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.MENU_HAD_USED));
+            }
+        }
         try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setMenus(menus);
@@ -60,7 +69,7 @@ public class BillService {
                     new Date().toString(),
                     HttpStatus.BAD_REQUEST.value(),
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    RMConstant.MENU_HAD_USED));
+                    RMConstant.SOME_THING_WRONG));
         }
     }
 
@@ -107,6 +116,18 @@ public class BillService {
                         RMConstant.MENU_NOT_FOUND));
             }
         }
+        for (Menu menu:menus) {
+            if(searchBillByMenu(menu)!=null){
+                Bill billCheck = searchBillByMenu(menu);
+                if(!billCheck.getId().equals(id)){
+                    throw new RMValidateException(new ErrorResponse(
+                            new Date().toString(),
+                            HttpStatus.BAD_REQUEST.value(),
+                            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                            RMConstant.MENU_HAD_USED));
+                }
+            }
+        }
         try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setId(id);
@@ -127,7 +148,7 @@ public class BillService {
                     new Date().toString(),
                     HttpStatus.BAD_REQUEST.value(),
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    RMConstant.MENU_HAD_USED));
+                    RMConstant.SOME_THING_WRONG));
         }
     }
 
@@ -172,5 +193,9 @@ public class BillService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.BILL_NOT_FOUND));
+    }
+
+    Bill searchBillByMenu(Menu menu){
+        return billRepository.findBillByMenusEquals(menu);
     }
 }

@@ -44,6 +44,15 @@ public class MenuService {
                     RMConstant.PRICE_VALIDATION));
         }
         List<Type> types = typeService.saveAllType(menu.getType());
+        for (Type type:types) {
+            if(searchMenuByType(type.getType())!=null){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.TYPE_HAD_USED));
+            }
+        }
         Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
         menuToCreate.setType(types);
         if(searchMenuByName(menuToCreate.getName())!=null){
@@ -61,7 +70,7 @@ public class MenuService {
                     new Date().toString(),
                     HttpStatus.BAD_REQUEST.value(),
                     HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    RMConstant.TYPE_HAD_USED));
+                    RMConstant.SOME_THING_WRONG));
         }
     }
 
@@ -71,9 +80,6 @@ public class MenuService {
         Pageable pageable = RMUtils.sortOrder(truePage,trueSize,sortBy,order);
         Page<Menu> pagedResult = menuRepository.findAll(pageable);
         if (pagedResult.hasContent()){
-            for (Menu menu :pagedResult.getContent()) {
-                System.out.println(menu.getId());
-            }
             return MenuMapper.menuToMenuDTOMapper(pagedResult.getContent());
         }
         else
@@ -116,6 +122,18 @@ public class MenuService {
             Menu menuToUpdate = MenuMapper.menuDTOToMenuMapper(menu);
             menuToUpdate.setType(types);
             menuToUpdate.setId(id);
+            for (Type type:types) {
+                if(searchMenuByType(type.getType())!=null){
+                    Menu menuCheck = searchMenuByType(type.getType());
+                    if(!menuCheck.getId().equals(id)){
+                        throw new RMValidateException(new ErrorResponse(
+                                new Date().toString(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                RMConstant.TYPE_HAD_USED));
+                    }
+                }
+            }
             try {
                 menuRepository.save(menuToUpdate);
                 return menu;
@@ -124,7 +142,7 @@ public class MenuService {
                         new Date().toString(),
                         HttpStatus.BAD_REQUEST.value(),
                         HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        RMConstant.TYPE_HAD_USED));
+                        RMConstant.SOME_THING_WRONG));
             }
         }
     }
@@ -145,7 +163,7 @@ public class MenuService {
                         new Date().toString(),
                         HttpStatus.NOT_FOUND.value(),
                         HttpStatus.NOT_FOUND.getReasonPhrase(),
-                        RMConstant.MENU_HAD_USED));
+                        RMConstant.SOME_THING_WRONG));
             }
         }
 
@@ -186,5 +204,16 @@ public class MenuService {
                     RMConstant.MENU_NOT_FOUND));
         }
         return menuRepository.findByNameEquals(name);
+    }
+
+    public Menu searchMenuByType(String type) {
+        if (type==null){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    RMConstant.MENU_NOT_FOUND));
+        }
+        return menuRepository.findByTypeTypeEquals(type);
     }
 }

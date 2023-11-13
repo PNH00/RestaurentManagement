@@ -12,4 +12,5 @@ public interface MenuRepository extends JpaRepository<Menu,UUID>{
     List<Menu> findByNameContaining(String name);
     List<Menu> findByDescriptionContaining(String description);
     List<Menu> findByTypeTypeContaining(String type);
+    Menu findByTypeTypeEquals(String type);
 }

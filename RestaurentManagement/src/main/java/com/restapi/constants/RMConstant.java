@@ -10,7 +10,7 @@ public class RMConstant {
     public static final String BILL_BAD_REQUEST = "Cannot done for this bill!" ;
     public static final String MENU_HAD_USED = "Have some bill use this menu!";
     public static final String BILL_NOT_FOUND = "The bill not found!" ;
-    public static final String NAME_EXISTED = "This type or menu already exists";
+    public static final String NAME_EXISTED = "This name already exists";
     public static final String BILL_HAD_PAID = "The bill had paid";
     public static final String PRICE_VALIDATION = "Price cannot less than 0!";
     public static final String DELETE_MESSAGE = "Delete item successfully";
@@ -27,4 +27,5 @@ public class RMConstant {
     public static final String UPDATE_TYPE_SUCCESSFULLY = "Update type successfully!";
     public static final String GET_TYPE_SUCCESSFULLY = "Get type successfully!";
     public static final String GET_TYPES_SUCCESSFULLY = "Get types successfully!";
+    public static final String SOME_THING_WRONG = "Something went wrong!";
 }
