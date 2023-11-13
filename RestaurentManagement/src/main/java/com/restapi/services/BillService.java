@@ -9,7 +9,7 @@ import com.restapi.mapper.BillMapper;
 import com.restapi.models.Bill;
 import com.restapi.models.Menu;
 import com.restapi.repositories.BillRepository;
-import com.restapi.response.ErrorResponse;
+import com.restapi.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -46,6 +46,15 @@ public class BillService {
                         RMConstant.MENU_NOT_FOUND));
             }
         }
+        for (Menu menu:menus) {
+            if(searchBillByMenu(menu)!=null){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.MENU_HAD_USED));
+            }
+        }
         try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setMenus(menus);
@@ -60,16 +69,12 @@ public class BillService {
                     new Date().toString(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    RMConstant.BILL_INTERNAL_SERVER_ERROR));
+                    RMConstant.SOME_THING_WRONG));
         }
     }
 
     public List<BillDTO> getAllBills() {
-        List<BillDTO> billDTOs = new ArrayList<BillDTO>();
-        for (Bill bill: billRepository.findAll()) {
-            billDTOs.add(BillMapper.billToBillDTOMapper(bill));
-        }
-        return billDTOs;
+        return BillMapper.billsToBillDTOMapper(billRepository.findAll());
     }
 
     public BillDTO getBillById(UUID id){
@@ -111,6 +116,18 @@ public class BillService {
                         RMConstant.MENU_NOT_FOUND));
             }
         }
+        for (Menu menu:menus) {
+            if(searchBillByMenu(menu)!=null){
+                Bill billCheck = searchBillByMenu(menu);
+                if(!billCheck.getId().equals(id)){
+                    throw new RMValidateException(new ErrorResponse(
+                            new Date().toString(),
+                            HttpStatus.BAD_REQUEST.value(),
+                            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                            RMConstant.MENU_HAD_USED));
+                }
+            }
+        }
         try {
             Bill bill = BillMapper.billDTOToBillMapper(billDTO);
             bill.setId(id);
@@ -131,23 +148,29 @@ public class BillService {
                     new Date().toString(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    RMConstant.BILL_INTERNAL_SERVER_ERROR));
+                    RMConstant.SOME_THING_WRONG));
         }
     }
 
     public void deleteBill(UUID id) {
         Date realDate = new Date();
+        List<UUID> uuids = new ArrayList<>();
         for (Bill bill:billRepository.findAll()) {
             if (bill.getPaymentStatus()==PaymentStatus.PAID){
                 Calendar calendarCreateDate = Calendar.getInstance();
                 calendarCreateDate.setTime(bill.getCreateDate());
                 Calendar calendarRealDate = Calendar.getInstance();
                 calendarRealDate.setTime(realDate);
-                calendarCreateDate.add(Calendar.DAY_OF_MONTH, 30);
+                calendarCreateDate.add(Calendar.MINUTE, 2);
                 if (calendarRealDate.after(calendarCreateDate)){
+                    for (Menu menu: bill.getMenus()) {
+                        uuids.add(menu.getId());
+                    }
                     billRepository.deleteById(id);
-                    for (Menu menu:bill.getMenus()) {
-                        menuService.deleteMenu(menu.getId());
+                }
+                if (!uuids.isEmpty()){
+                    for (UUID uuid:uuids){
+                        menuService.deleteMenu(uuid);
                     }
                 }
             }
@@ -170,5 +193,9 @@ public class BillService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.BILL_NOT_FOUND));
+    }
+
+    Bill searchBillByMenu(Menu menu){
+        return billRepository.findBillByMenusEquals(menu);
     }
 }

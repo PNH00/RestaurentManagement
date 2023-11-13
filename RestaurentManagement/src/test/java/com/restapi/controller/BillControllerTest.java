@@ -7,7 +7,7 @@ import com.restapi.dto.TypeDTO;
 import com.restapi.enums.PaymentStatus;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.models.Bill;
-import com.restapi.response.SuccessResponse;
+import com.restapi.dto.SuccessResponse;
 import com.restapi.services.BillService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -5,7 +5,7 @@ import com.restapi.dto.MenuDTO;
 import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.mapper.MenuMapper;
-import com.restapi.response.SuccessResponse;
+import com.restapi.dto.SuccessResponse;
 import com.restapi.services.MenuService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

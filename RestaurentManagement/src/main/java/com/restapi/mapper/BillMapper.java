@@ -31,11 +31,11 @@ public class BillMapper {
         bill.setMenus(menus);
         return bill;
     }
-    public static List<Bill> billDTOToBillMapper(List<BillDTO> billDTOs){
-        List<Bill> bills = new ArrayList<Bill>();
-        for (BillDTO billDTO: billDTOs) {
-            bills.add(billDTOToBillMapper(billDTO));
+    public static List<BillDTO> billsToBillDTOMapper(List<Bill> bills){
+        List<BillDTO> billDTOs = new ArrayList<BillDTO>();
+        for (Bill bill: bills) {
+            billDTOs.add(billToBillDTOMapper(bill));
         }
-        return bills;
+        return billDTOs;
     }
 }
