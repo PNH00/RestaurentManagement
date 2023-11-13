@@ -9,7 +9,7 @@ import com.restapi.mapper.BillMapper;
 import com.restapi.models.Bill;
 import com.restapi.models.Menu;
 import com.restapi.repositories.BillRepository;
-import com.restapi.response.ErrorResponse;
+import com.restapi.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -58,18 +58,14 @@ public class BillService {
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    RMConstant.BILL_INTERNAL_SERVER_ERROR));
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.MENU_HAD_USED));
         }
     }
 
     public List<BillDTO> getAllBills() {
-        List<BillDTO> billDTOs = new ArrayList<BillDTO>();
-        for (Bill bill: billRepository.findAll()) {
-            billDTOs.add(BillMapper.billToBillDTOMapper(bill));
-        }
-        return billDTOs;
+        return BillMapper.billsToBillDTOMapper(billRepository.findAll());
     }
 
     public BillDTO getBillById(UUID id){
@@ -129,25 +125,31 @@ public class BillService {
         } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    RMConstant.BILL_INTERNAL_SERVER_ERROR));
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.MENU_HAD_USED));
         }
     }
 
     public void deleteBill(UUID id) {
         Date realDate = new Date();
+        List<UUID> uuids = new ArrayList<>();
         for (Bill bill:billRepository.findAll()) {
             if (bill.getPaymentStatus()==PaymentStatus.PAID){
                 Calendar calendarCreateDate = Calendar.getInstance();
                 calendarCreateDate.setTime(bill.getCreateDate());
                 Calendar calendarRealDate = Calendar.getInstance();
                 calendarRealDate.setTime(realDate);
-                calendarCreateDate.add(Calendar.DAY_OF_MONTH, 30);
+                calendarCreateDate.add(Calendar.MINUTE, 2);
                 if (calendarRealDate.after(calendarCreateDate)){
+                    for (Menu menu: bill.getMenus()) {
+                        uuids.add(menu.getId());
+                    }
                     billRepository.deleteById(id);
-                    for (Menu menu:bill.getMenus()) {
-                        menuService.deleteMenu(menu.getId());
+                }
+                if (!uuids.isEmpty()){
+                    for (UUID uuid:uuids){
+                        menuService.deleteMenu(uuid);
                     }
                 }
             }

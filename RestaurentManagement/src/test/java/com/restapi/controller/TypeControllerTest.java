@@ -3,7 +3,7 @@ package com.restapi.controller;
 import com.restapi.controllers.TypeController;
 import com.restapi.dto.TypeDTO;
 import com.restapi.exceptions.RMValidateException;
-import com.restapi.response.SuccessResponse;
+import com.restapi.dto.SuccessResponse;
 import com.restapi.services.TypeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

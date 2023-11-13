@@ -1,7 +1,8 @@
 package com.restapi.controllers;
 
+import com.restapi.constants.RMConstant;
 import com.restapi.dto.MenuDTO;
-import com.restapi.response.SuccessResponse;
+import com.restapi.dto.SuccessResponse;
 import com.restapi.services.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +28,7 @@ public class MenuController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Create menu successfully!",
+                RMConstant.CREATE_MENU_SUCCESSFULLY,
                 menuService.createMenu(menu));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -43,9 +44,9 @@ public class MenuController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get menus successfully!",
+                RMConstant.GET_MENUS_SUCCESSFULLY,
                 list);
-        return new ResponseEntity<>(successResponse,new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -53,7 +54,7 @@ public class MenuController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get menu successfully!",
+                RMConstant.GET_MENU_SUCCESSFULLY,
                 menuService.getMenuById(id));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -63,7 +64,7 @@ public class MenuController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Update menu successfully!",
+                RMConstant.UPDATE_MENU_SUCCESSFULLY,
                 menuService.updateMenu(id,menu));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -74,17 +75,17 @@ public class MenuController {
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Delete menu successfully!",
-                "No data response");
+                RMConstant.DELETE_MESSAGE,
+                RMConstant.NO_DATA_MESSAGE);
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<SuccessResponse> searchMenus(@RequestParam(required = false) String keyword) {
+    public ResponseEntity<SuccessResponse> searchMenus(@RequestParam String keyword) {
         SuccessResponse successResponseFound = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Search menus successfully!",
+                RMConstant.GET_MENUS_SUCCESSFULLY,
                 menuService.searchMenus(keyword));
         return new ResponseEntity<>(successResponseFound,HttpStatus.OK);
     }

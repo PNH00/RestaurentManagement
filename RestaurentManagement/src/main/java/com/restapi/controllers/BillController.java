@@ -1,7 +1,8 @@
 package com.restapi.controllers;
 
+import com.restapi.constants.RMConstant;
 import com.restapi.dto.BillDTO;
-import com.restapi.response.SuccessResponse;
+import com.restapi.dto.SuccessResponse;
 import com.restapi.services.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class BillController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Create bill successfully!",
+                RMConstant.CREATE_BILL_SUCCESSFULLY,
                 billService.createBill(bill));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -35,7 +36,7 @@ public class BillController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get bills successfully!",
+                RMConstant.GET_BILLS_SUCCESSFULLY,
                 billDTOs);
         return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
@@ -45,7 +46,7 @@ public class BillController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get bill successfully!",
+                RMConstant.GET_BILL_SUCCESSFULLY,
                 billService.getBillById(id));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -55,7 +56,7 @@ public class BillController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Update bill successfully!",
+                RMConstant.UPDATE_BILL_SUCCESSFULLY,
                 billService.updateBill(id,billDTO));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -66,8 +67,8 @@ public class BillController {
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Delete Bill successfully!",
-                "No data response");
+                RMConstant.DELETE_MESSAGE,
+                RMConstant.NO_DATA_MESSAGE);
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 }

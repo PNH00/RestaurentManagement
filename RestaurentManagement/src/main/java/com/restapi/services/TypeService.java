@@ -1,7 +1,7 @@
 package com.restapi.services;
 
 import com.restapi.dto.TypeDTO;
-import com.restapi.response.ErrorResponse;
+import com.restapi.dto.ErrorResponse;
 import com.restapi.exceptions.RMValidateException;
 import com.restapi.mapper.TypeMapper;
 import com.restapi.models.Type;
@@ -41,6 +41,13 @@ public class TypeService {
     }
 
     public TypeDTO createType(TypeDTO type) {
+        if (searchTypeByType(type.getType())!=null){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.NAME_EXISTED));
+        }
         Type typeToCreate = new Type();
         typeToCreate.setType(type.getType());
         typeRepository.save(typeToCreate);
@@ -50,6 +57,13 @@ public class TypeService {
     public List<Type> saveAllType(List<TypeDTO> typeDTOs){
         List<Type> types = new ArrayList<Type>();
         for (TypeDTO typeDTO : typeDTOs) {
+            if (searchTypeByType(typeDTO.getType())!=null){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.NAME_EXISTED));
+            }
             Type type = new Type();
             type.setType(typeDTO.getType());
             types.add(type);
@@ -84,9 +98,22 @@ public class TypeService {
         }catch (Exception e){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    RMConstant.INTERNAL_SERVER_ERROR));
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.TYPE_HAD_USED));
         }
+    }
+    public List<Type> searchTypeByType(String type) {
+        if (type==null){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    RMConstant.TYPE_NOT_FOUND));
+        }
+        if(typeRepository.findByTypeEquals(type).isEmpty()){
+            return null;
+        }
+        return typeRepository.findByTypeEquals(type);
     }
 }

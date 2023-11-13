@@ -1,7 +1,8 @@
 package com.restapi.controllers;
 
+import com.restapi.constants.RMConstant;
 import com.restapi.dto.TypeDTO;
-import com.restapi.response.SuccessResponse;
+import com.restapi.dto.SuccessResponse;
 import com.restapi.services.TypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class TypeController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get types successfully!",
+                RMConstant.GET_TYPES_SUCCESSFULLY,
                 types);
         return new ResponseEntity<>(successResponse, HttpStatus.OK);
     }
@@ -37,7 +38,7 @@ public class TypeController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Get type successfully!",
+                RMConstant.GET_TYPE_SUCCESSFULLY,
                 typeService.getTypeById(id));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
 
@@ -48,7 +49,7 @@ public class TypeController {
         SuccessResponse  successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Create type successfully!",
+                RMConstant.CREATE_TYPE_SUCCESSFULLY,
                 typeService.createType(type));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -58,7 +59,7 @@ public class TypeController {
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Update type successfully!",
+                RMConstant.UPDATE_TYPE_SUCCESSFULLY,
                 typeService.updateType(id,type));
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
@@ -69,8 +70,8 @@ public class TypeController {
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 HttpStatus.OK.getReasonPhrase(),
-                "Delete type successfully!",
-                "No data response");
+                RMConstant.DELETE_MESSAGE,
+                RMConstant.NO_DATA_MESSAGE);
         return new ResponseEntity<>(successResponse,HttpStatus.OK);
     }
 }
