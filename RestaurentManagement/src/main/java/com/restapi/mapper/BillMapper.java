@@ -9,11 +9,12 @@ import java.util.List;
 
 public class BillMapper {
     public static BillDTO billToBillDTOMapper(Bill bill){
-        List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
+        List<MenuDTO> menuDTOs = new ArrayList<>();
         for (Menu menu:bill.getMenus()) {
             menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
         }
         return new BillDTO(
+                bill.getId(),
                 menuDTOs,
                 bill.getQuantities(),
                 bill.getTotalPrice(),
@@ -21,7 +22,7 @@ public class BillMapper {
                 bill.getCreateDate());
     }
     public static Bill billDTOToBillMapper(BillDTO billDTO){
-        List<Menu> menus = new ArrayList<Menu>();
+        List<Menu> menus = new ArrayList<>();
         for (MenuDTO menuDTO:billDTO.getMenus()) {
             menus.add(MenuMapper.menuDTOToMenuMapper(menuDTO));
         }
@@ -32,7 +33,7 @@ public class BillMapper {
         return bill;
     }
     public static List<BillDTO> billsToBillDTOMapper(List<Bill> bills){
-        List<BillDTO> billDTOs = new ArrayList<BillDTO>();
+        List<BillDTO> billDTOs = new ArrayList<>();
         for (Bill bill: bills) {
             billDTOs.add(billToBillDTOMapper(bill));
         }

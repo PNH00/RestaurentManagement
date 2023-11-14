@@ -3,12 +3,11 @@ package com.restapi.constants;
 public class RMConstant {
 
     public static final String TYPE_NOT_FOUND = "The type not found!" ;
-    public static final String TYPE_BAD_REQUEST = "Cannot done for this type!" ;
-    public static final String TYPE_HAD_USED = "Have some menu use this type";
     public static final String MENU_NOT_FOUND = "The menu not found!" ;
     public static final String MENU_BAD_REQUEST = "Cannot done for this menu!" ;
     public static final String BILL_BAD_REQUEST = "Cannot done for this bill!" ;
     public static final String MENU_HAD_USED = "Have some bill use this menu!";
+    public static final String TYPE_HAD_USED = "Have some menu use this type!";
     public static final String BILL_NOT_FOUND = "The bill not found!" ;
     public static final String NAME_EXISTED = "This name already exists";
     public static final String BILL_HAD_PAID = "The bill had paid";

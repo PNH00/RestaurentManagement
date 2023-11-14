@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface TypeRepository extends JpaRepository<Type,UUID> {
     Type findByTypeEquals(String keyword);
+    List<Type> findByTypeContaining(String keyword);
 }

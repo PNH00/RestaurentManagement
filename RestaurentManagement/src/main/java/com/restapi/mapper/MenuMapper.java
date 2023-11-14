@@ -8,15 +8,16 @@ import java.util.List;
 public class MenuMapper {
     public static MenuDTO menuToMenuDTOMapper(Menu menu){
         return new MenuDTO(
+                menu.getId(),
                 menu.getName(),
                 menu.getDescription(),
                 menu.getImage(),
                 menu.getPrice(),
-                TypeMapper.typeToTypeDTOMapper(menu.getType()));
+                TypeMapper.typeToTypeDTOMapper(menu.getTypes()));
     }
 
     public static List<MenuDTO> menuToMenuDTOMapper(List<Menu> menus){
-        List<MenuDTO> menuDTOs = new ArrayList<MenuDTO>();
+        List<MenuDTO> menuDTOs = new ArrayList<>();
         for (Menu menu: menus) {
             menuDTOs.add(menuToMenuDTOMapper(menu));
         }

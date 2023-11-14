@@ -26,42 +26,36 @@ public class BillService {
     }
 
     public BillDTO createBill(BillDTO billDTO) {
-        if (billDTO.getMenus().isEmpty()) {
+        Bill bill = checkBillAndCalculator(billDTO);
+        try {
+            bill.setPaymentStatus(PaymentStatus.UNPAID);
+            billRepository.save(bill);
+            return BillMapper.billToBillDTOMapper(bill);
+        } catch (Exception e) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    RMConstant.BILL_BAD_REQUEST));
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    RMConstant.SOME_THING_WRONG));
         }
-        List<Menu> menus = new ArrayList<>();
-        for (MenuDTO menuDTO : billDTO.getMenus()) {
-            Menu menuSearch = menuService.searchMenuByName(menuDTO.getName());
-            if (menuSearch!=null) {
-                menus.add(menuSearch);
-            } else {
-                throw new RMValidateException(new ErrorResponse(
-                        new Date().toString(),
-                        HttpStatus.NOT_FOUND.value(),
-                        HttpStatus.NOT_FOUND.getReasonPhrase(),
-                        RMConstant.MENU_NOT_FOUND));
-            }
-        }
-        for (Menu menu:menus) {
-            if(searchBillByMenu(menu)!=null){
-                throw new RMValidateException(new ErrorResponse(
-                        new Date().toString(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        RMConstant.MENU_HAD_USED));
-            }
-        }
+    }
+
+    public BillDTO updateBill(UUID id, BillDTO billDTO) {
+        if(!billRepository.existsById(id))
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.NOT_FOUND.value(),
+                    HttpStatus.NOT_FOUND.getReasonPhrase(),
+                    RMConstant.BILL_NOT_FOUND));
+        Bill bill = checkBillAndCalculator(billDTO);
         try {
-            Bill bill = BillMapper.billDTOToBillMapper(billDTO);
-            bill.setMenus(menus);
-            bill.setQuantities(menus.size());
-            bill.setTotalPrice(menus.stream().mapToDouble(Menu::getPrice).sum());
-            bill.setPaymentStatus(PaymentStatus.UNPAID);
-            bill.setCreateDate(new Date());
+            bill.setId(id);
+            if (billDTO.getPaymentStatus()==PaymentStatus.PAID){
+                bill.setPaymentStatus(PaymentStatus.PAID);
+            }
+            else {
+                bill.setPaymentStatus(PaymentStatus.UNPAID);
+            }
             billRepository.save(bill);
             return BillMapper.billToBillDTOMapper(bill);
         } catch (Exception e) {
@@ -87,74 +81,8 @@ public class BillService {
         return BillMapper.billToBillDTOMapper(billRepository.findById(id).get());
     }
 
-    public BillDTO updateBill(UUID id, BillDTO billDTO) {
-        if(!billRepository.existsById(id))
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.NOT_FOUND.value(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
-                    RMConstant.BILL_NOT_FOUND));
-        else {
-            if (billDTO.getMenus().isEmpty()) {
-                throw new RMValidateException(new ErrorResponse(
-                        new Date().toString(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        RMConstant.BILL_BAD_REQUEST));
-            }
-        }
-        List<Menu> menus = new ArrayList<>();
-        for (MenuDTO menuDTO : billDTO.getMenus()) {
-            Menu menuSearch = menuService.searchMenuByName(menuDTO.getName());
-            if (menuSearch!=null) {
-                menus.add(menuSearch);
-            } else {
-                throw new RMValidateException(new ErrorResponse(
-                        new Date().toString(),
-                        HttpStatus.NOT_FOUND.value(),
-                        HttpStatus.NOT_FOUND.getReasonPhrase(),
-                        RMConstant.MENU_NOT_FOUND));
-            }
-        }
-        for (Menu menu:menus) {
-            if(searchBillByMenu(menu)!=null){
-                Bill billCheck = searchBillByMenu(menu);
-                if(!billCheck.getId().equals(id)){
-                    throw new RMValidateException(new ErrorResponse(
-                            new Date().toString(),
-                            HttpStatus.BAD_REQUEST.value(),
-                            HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                            RMConstant.MENU_HAD_USED));
-                }
-            }
-        }
-        try {
-            Bill bill = BillMapper.billDTOToBillMapper(billDTO);
-            bill.setId(id);
-            bill.setMenus(menus);
-            bill.setQuantities(menus.size());
-            bill.setTotalPrice(menus.stream().mapToDouble(Menu::getPrice).sum());
-            bill.setCreateDate(new Date());
-            if (billDTO.getPaymentStatus()!=null){
-                bill.setPaymentStatus(PaymentStatus.PAID);
-            }
-            else {
-                bill.setPaymentStatus(PaymentStatus.UNPAID);
-            }
-            billRepository.save(bill);
-            return BillMapper.billToBillDTOMapper(bill);
-        } catch (Exception e) {
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    RMConstant.SOME_THING_WRONG));
-        }
-    }
-
     public void deleteBill(UUID id) {
         Date realDate = new Date();
-        List<UUID> uuids = new ArrayList<>();
         for (Bill bill:billRepository.findAll()) {
             if (bill.getPaymentStatus()==PaymentStatus.PAID){
                 Calendar calendarCreateDate = Calendar.getInstance();
@@ -163,15 +91,7 @@ public class BillService {
                 calendarRealDate.setTime(realDate);
                 calendarCreateDate.add(Calendar.MINUTE, 2);
                 if (calendarRealDate.after(calendarCreateDate)){
-                    for (Menu menu: bill.getMenus()) {
-                        uuids.add(menu.getId());
-                    }
                     billRepository.deleteById(id);
-                }
-                if (!uuids.isEmpty()){
-                    for (UUID uuid:uuids){
-                        menuService.deleteMenu(uuid);
-                    }
                 }
             }
         }
@@ -195,7 +115,32 @@ public class BillService {
                     RMConstant.BILL_NOT_FOUND));
     }
 
-    Bill searchBillByMenu(Menu menu){
-        return billRepository.findBillByMenusEquals(menu);
+    public Bill checkBillAndCalculator(BillDTO billDTO){
+        if (billDTO.getMenus().isEmpty()) {
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.BILL_BAD_REQUEST));
+        }
+        List<Menu> menus = new ArrayList<>();
+        for (MenuDTO menuDTO : billDTO.getMenus()) {
+            Menu menuSearch = menuService.searchMenuByName(menuDTO.getName());
+            if (menuSearch!=null) {
+                menus.add(menuSearch);
+            } else {
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND.getReasonPhrase(),
+                        RMConstant.MENU_NOT_FOUND));
+            }
+        }
+        Bill bill = BillMapper.billDTOToBillMapper(billDTO);
+        bill.setMenus(new ArrayList<>(new HashSet<>(menus)));
+        bill.setQuantities(menus.size());
+        bill.setTotalPrice(menus.stream().mapToDouble(Menu::getPrice).sum());
+        bill.setCreateDate(new Date());
+        return bill;
     }
 }
