@@ -18,7 +18,12 @@ public class Bill {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    @OneToMany
+    @ManyToMany
+    @JoinTable(
+            name = "bill_menus",
+            joinColumns = @JoinColumn(name = "bill_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_id")
+    )
     private List<Menu> menus;
     @Column(nullable = false, columnDefinition = "int")
     private int quantities;

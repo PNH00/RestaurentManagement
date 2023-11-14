@@ -25,6 +25,13 @@ public class Menu {
     private String image;
     @Column(nullable = false)
     private double price;
-    @OneToMany
-    private List<Type> type;
+    @ManyToMany
+    @JoinTable(
+            name = "menu_types",
+            joinColumns = @JoinColumn(name = "menu_id"),
+            inverseJoinColumns = @JoinColumn(name = "type_id")
+    )
+    private List<Type> types;
+    @ManyToMany(mappedBy = "menus")
+    private List<Bill> bills;
 }

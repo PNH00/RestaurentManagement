@@ -29,32 +29,7 @@ public class MenuService {
     }
 
     public MenuDTO createMenu(MenuDTO menu) {
-        if (menu.getType().isEmpty()) {
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    RMConstant.TYPE_BAD_REQUEST));
-        }
-        if (menu.getPrice()<0){
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.BAD_REQUEST.value(),
-                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                    RMConstant.PRICE_VALIDATION));
-        }
-        List<Type> types = typeService.saveAllType(menu.getType());
-        for (Type type:types) {
-            if(searchMenuByType(type.getType())!=null){
-                throw new RMValidateException(new ErrorResponse(
-                        new Date().toString(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        RMConstant.TYPE_HAD_USED));
-            }
-        }
-        Menu menuToCreate = MenuMapper.menuDTOToMenuMapper(menu);
-        menuToCreate.setType(types);
+        Menu menuToCreate = checkTypesAndPrice(menu);
         if(searchMenuByName(menuToCreate.getName())!=null){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -64,7 +39,7 @@ public class MenuService {
         }
         try {
             menuRepository.save(menuToCreate);
-            return menu;
+            return MenuMapper.menuToMenuDTOMapper(menuToCreate);
         }catch (Exception e){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -83,7 +58,7 @@ public class MenuService {
             return MenuMapper.menuToMenuDTOMapper(pagedResult.getContent());
         }
         else
-            return new ArrayList<MenuDTO>();
+            return new ArrayList<>();
     }
 
     public MenuDTO getMenuById(UUID id){
@@ -104,39 +79,11 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         else {
-            if (menu.getType().isEmpty()) {
-                throw new RMValidateException(new ErrorResponse(
-                        new Date().toString(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        RMConstant.MENU_BAD_REQUEST));
-            }
-            if (menu.getPrice()<0){
-                throw new RMValidateException(new ErrorResponse(
-                        new Date().toString(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        RMConstant.PRICE_VALIDATION));
-            }
-            List<Type> types = typeService.saveAllType(menu.getType());
-            Menu menuToUpdate = MenuMapper.menuDTOToMenuMapper(menu);
-            menuToUpdate.setType(types);
+            Menu menuToUpdate = checkTypesAndPrice(menu);
             menuToUpdate.setId(id);
-            for (Type type:types) {
-                if(searchMenuByType(type.getType())!=null){
-                    Menu menuCheck = searchMenuByType(type.getType());
-                    if(!menuCheck.getId().equals(id)){
-                        throw new RMValidateException(new ErrorResponse(
-                                new Date().toString(),
-                                HttpStatus.BAD_REQUEST.value(),
-                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                                RMConstant.TYPE_HAD_USED));
-                    }
-                }
-            }
             try {
                 menuRepository.save(menuToUpdate);
-                return menu;
+                return MenuMapper.menuToMenuDTOMapper(menuToUpdate);
             }catch (Exception e){
                 throw new RMValidateException(new ErrorResponse(
                         new Date().toString(),
@@ -148,7 +95,7 @@ public class MenuService {
     }
 
     public void deleteMenu(UUID id) {
-        if(!menuRepository.existsById(id)){
+        if(menuRepository.findById(id).isEmpty()){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
@@ -156,6 +103,13 @@ public class MenuService {
                     RMConstant.MENU_NOT_FOUND));
         }
         else{
+            if(!menuRepository.findById(id).get().getBills().isEmpty()){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.MENU_HAD_USED));
+            }
             try {
                 menuRepository.deleteById(id);
             }catch (Exception e){
@@ -177,15 +131,15 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         }
-        List<Menu> menusByName = menuRepository.findByNameContaining(keyword);
-        List<Menu> menusByDescription = menuRepository.findByDescriptionContaining(keyword);
-        List<Menu> menusByType = menuRepository.findByTypeTypeContaining(keyword);
-
         Set<Menu> uniqueMenus = new HashSet<>();
-        uniqueMenus.addAll(menusByName);
-        uniqueMenus.addAll(menusByDescription);
-        uniqueMenus.addAll(menusByType);
-
+        uniqueMenus.addAll(menuRepository.findByNameContaining(keyword));
+        uniqueMenus.addAll(menuRepository.findByDescriptionContaining(keyword));
+        if (!typeService.searchTypesByType(keyword).isEmpty()){
+            Set<Type> types = new HashSet<>(typeService.searchTypesByType(keyword));
+            for (Type type:types) {
+                uniqueMenus.addAll(menuRepository.findMenusByTypesContaining(type));
+            }
+        }
         if (uniqueMenus.isEmpty()){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -196,24 +150,27 @@ public class MenuService {
         return MenuMapper.menuToMenuDTOMapper(new ArrayList<>(uniqueMenus));
     }
     public Menu searchMenuByName(String name) {
-        if (name==null){
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.NOT_FOUND.value(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
-                    RMConstant.MENU_NOT_FOUND));
-        }
         return menuRepository.findByNameEquals(name);
     }
 
-    public Menu searchMenuByType(String type) {
-        if (type==null){
+    public Menu checkTypesAndPrice(MenuDTO menu){
+        if (menu.getTypes().isEmpty()) {
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
-                    HttpStatus.NOT_FOUND.value(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
-                    RMConstant.MENU_NOT_FOUND));
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.MENU_BAD_REQUEST));
         }
-        return menuRepository.findByTypeTypeEquals(type);
+        if (menu.getPrice()<0){
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.PRICE_VALIDATION));
+        }
+        List<Type> types = typeService.saveAllType(menu.getTypes());
+        Menu menuChecked = MenuMapper.menuDTOToMenuMapper(menu);
+        menuChecked.setTypes(types);
+        return menuChecked;
     }
 }

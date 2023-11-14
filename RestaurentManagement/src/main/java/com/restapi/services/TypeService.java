@@ -23,7 +23,7 @@ public class TypeService {
     }
 
     public List<TypeDTO> getAllTypes() {
-        List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
+        List<TypeDTO> typeDTOs = new ArrayList<>();
         for (Type type: typeRepository.findAll()) {
             typeDTOs.add(TypeMapper.typeToTypeDTOMapper(type));
         }
@@ -51,11 +51,11 @@ public class TypeService {
         Type typeToCreate = new Type();
         typeToCreate.setType(type.getType());
         typeRepository.save(typeToCreate);
-        return type;
+        return TypeMapper.typeToTypeDTOMapper(typeToCreate);
     }
 
     public List<Type> saveAllType(List<TypeDTO> typeDTOs){
-        List<Type> types = new ArrayList<Type>();
+        List<Type> types = new ArrayList<>();
         for (TypeDTO typeDTO : typeDTOs) {
             if (searchTypeByType(typeDTO.getType())!=null){
                 types.add(searchTypeByType(typeDTO.getType()));
@@ -86,7 +86,7 @@ public class TypeService {
             typeToUpdate.setId(id);
             typeToUpdate.setType(type.getType());
             typeRepository.save(typeToUpdate);
-            return type;
+            return TypeMapper.typeToTypeDTOMapper(typeToUpdate);
         }
         throw new RMValidateException(new ErrorResponse(
                 new Date().toString(),
@@ -96,30 +96,36 @@ public class TypeService {
     }
 
     public void deleteType(UUID id){
-        if (!typeRepository.existsById(id))
+        if (typeRepository.findById(id).isEmpty()){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
-        try {
-            typeRepository.deleteById(id);
-        }catch (Exception e){
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    RMConstant.SOME_THING_WRONG));
+        }else {
+            if (!typeRepository.findById(id).get().getMenus().isEmpty()){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.TYPE_HAD_USED));
+            }
+            try {
+                typeRepository.deleteById(id);
+            }catch (Exception e){
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                        RMConstant.SOME_THING_WRONG));
+            }
         }
     }
     public Type searchTypeByType(String type) {
-        if (type==null){
-            throw new RMValidateException(new ErrorResponse(
-                    new Date().toString(),
-                    HttpStatus.NOT_FOUND.value(),
-                    HttpStatus.NOT_FOUND.getReasonPhrase(),
-                    RMConstant.TYPE_NOT_FOUND));
-        }
         return typeRepository.findByTypeEquals(type);
+    }
+
+    public List<Type> searchTypesByType(String type) {
+        return typeRepository.findByTypeContaining(type);
     }
 }

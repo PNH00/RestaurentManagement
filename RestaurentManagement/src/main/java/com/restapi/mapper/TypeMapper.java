@@ -7,11 +7,11 @@ import java.util.List;
 
 public class TypeMapper {
     public static TypeDTO typeToTypeDTOMapper(Type type){
-        return new TypeDTO(type.getType());
+        return new TypeDTO(type.getId(),type.getType());
     }
 
     public static List<TypeDTO> typeToTypeDTOMapper(List<Type> types){
-        List<TypeDTO> typeDTOs = new ArrayList<TypeDTO>();
+        List<TypeDTO> typeDTOs = new ArrayList<>();
         for (Type type:types) {
             typeDTOs.add(typeToTypeDTOMapper(type));
         }
