@@ -39,7 +39,7 @@ public class MenuService {
         }
         try {
             menuRepository.save(menuToCreate);
-            return MenuMapper.menuToMenuDTOMapper(menuToCreate);
+            return MenuMapper.menusToMenuDTOsMapper(menuToCreate);
         }catch (Exception e){
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
@@ -55,7 +55,7 @@ public class MenuService {
         Pageable pageable = RMUtils.sortOrder(truePage,trueSize,sortBy,order);
         Page<Menu> pagedResult = menuRepository.findAll(pageable);
         if (pagedResult.hasContent()){
-            return MenuMapper.menuToMenuDTOMapper(pagedResult.getContent());
+            return MenuMapper.menusToMenuDTOsMapper(pagedResult.getContent());
         }
         else
             return new ArrayList<>();
@@ -68,7 +68,7 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
-        return MenuMapper.menuToMenuDTOMapper(menuRepository.findById(id).get());
+        return MenuMapper.menusToMenuDTOsMapper(menuRepository.findById(id).get());
     }
 
     public MenuDTO updateMenu(UUID id, MenuDTO menu) {
@@ -83,7 +83,7 @@ public class MenuService {
             menuToUpdate.setId(id);
             try {
                 menuRepository.save(menuToUpdate);
-                return MenuMapper.menuToMenuDTOMapper(menuToUpdate);
+                return MenuMapper.menusToMenuDTOsMapper(menuToUpdate);
             }catch (Exception e){
                 throw new RMValidateException(new ErrorResponse(
                         new Date().toString(),
@@ -147,7 +147,7 @@ public class MenuService {
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.MENU_NOT_FOUND));
         }
-        return MenuMapper.menuToMenuDTOMapper(new ArrayList<>(uniqueMenus));
+        return MenuMapper.menusToMenuDTOsMapper(new ArrayList<>(uniqueMenus));
     }
     public Menu searchMenuByName(String name) {
         return menuRepository.findByNameEquals(name);
@@ -170,7 +170,7 @@ public class MenuService {
         }
         List<Type> types = typeService.saveAllType(menu.getTypes());
         Menu menuChecked = MenuMapper.menuDTOToMenuMapper(menu);
-        menuChecked.setTypes(types);
+        menuChecked.setTypes(new ArrayList<>(new HashSet<>(types)));
         return menuChecked;
     }
 }

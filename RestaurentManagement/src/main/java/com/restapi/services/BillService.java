@@ -41,12 +41,18 @@ public class BillService {
     }
 
     public BillDTO updateBill(UUID id, BillDTO billDTO) {
-        if(!billRepository.existsById(id))
+        if(billRepository.findById(id).isEmpty())
             throw new RMValidateException(new ErrorResponse(
                     new Date().toString(),
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.BILL_NOT_FOUND));
+        if(billRepository.findById(id).get().getPaymentStatus()==PaymentStatus.PAID)
+            throw new RMValidateException(new ErrorResponse(
+                    new Date().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    RMConstant.BILL_HAD_PAID));
         Bill bill = checkBillAndCalculator(billDTO);
         try {
             bill.setId(id);

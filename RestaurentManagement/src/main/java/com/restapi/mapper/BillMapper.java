@@ -11,7 +11,7 @@ public class BillMapper {
     public static BillDTO billToBillDTOMapper(Bill bill){
         List<MenuDTO> menuDTOs = new ArrayList<>();
         for (Menu menu:bill.getMenus()) {
-            menuDTOs.add(MenuMapper.menuToMenuDTOMapper(menu));
+            menuDTOs.add(MenuMapper.menusToMenuDTOsMapper(menu));
         }
         return new BillDTO(
                 bill.getId(),

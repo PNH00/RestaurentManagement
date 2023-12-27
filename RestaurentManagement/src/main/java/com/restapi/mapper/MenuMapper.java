@@ -6,20 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MenuMapper {
-    public static MenuDTO menuToMenuDTOMapper(Menu menu){
+    public static MenuDTO menusToMenuDTOsMapper(Menu menu){
         return new MenuDTO(
                 menu.getId(),
                 menu.getName(),
                 menu.getDescription(),
                 menu.getImage(),
                 menu.getPrice(),
-                TypeMapper.typeToTypeDTOMapper(menu.getTypes()));
+                TypeMapper.typesToTypeDTOsMapper(menu.getTypes()));
     }
 
-    public static List<MenuDTO> menuToMenuDTOMapper(List<Menu> menus){
+    public static List<MenuDTO> menusToMenuDTOsMapper(List<Menu> menus){
         List<MenuDTO> menuDTOs = new ArrayList<>();
         for (Menu menu: menus) {
-            menuDTOs.add(menuToMenuDTOMapper(menu));
+            menuDTOs.add(menusToMenuDTOsMapper(menu));
         }
         return menuDTOs;
     }
