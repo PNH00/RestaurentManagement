@@ -1,0 +1,35 @@
+#footer {
+    background-color: bisque;
+}
+
+#img_iuh_logo_footer {
+    width: 55%;
+    height: 55%;
+}
+
+#footer_ls {
+    padding-top: 15px;
+}
+
+#button {
+    padding-top: 25px;
+    background-color:aqua;
+    border-radius: 10px;
+    padding-bottom: 25px;
+    float:right;
+}
+
+#table {
+    padding-top: 80px;
+}
+
+#logoutLi {
+    padding-top: 40px;
+    float: right;
+    visibility:hidden
+}
+
+#logout {
+    background-color: aqua;
+    border-radius: 10px;
+}
