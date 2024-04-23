@@ -25,7 +25,7 @@ public class TypeService {
     public List<TypeDTO> getAllTypes() {
         List<TypeDTO> typeDTOs = new ArrayList<>();
         for (Type type: typeRepository.findAll()) {
-            typeDTOs.add(TypeMapper.typeToTypeDTOMapper(type));
+            typeDTOs.add(TypeMapper.typesToTypeDTOsMapper(type));
         }
         return typeDTOs;
     }
@@ -37,7 +37,7 @@ public class TypeService {
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
                     RMConstant.TYPE_NOT_FOUND));
-        return TypeMapper.typeToTypeDTOMapper(typeRepository.findById(id).get());
+        return TypeMapper.typesToTypeDTOsMapper(typeRepository.findById(id).get());
     }
 
     public TypeDTO createType(TypeDTO type) {
@@ -51,7 +51,7 @@ public class TypeService {
         Type typeToCreate = new Type();
         typeToCreate.setType(type.getType());
         typeRepository.save(typeToCreate);
-        return TypeMapper.typeToTypeDTOMapper(typeToCreate);
+        return TypeMapper.typesToTypeDTOsMapper(typeToCreate);
     }
 
     public List<Type> saveAllType(List<TypeDTO> typeDTOs){
@@ -60,10 +60,11 @@ public class TypeService {
             if (searchTypeByType(typeDTO.getType())!=null){
                 types.add(searchTypeByType(typeDTO.getType()));
             }else {
-                Type type = new Type();
-                type.setType(typeDTO.getType());
-                types.add(type);
-                typeRepository.save(type);
+                throw new RMValidateException(new ErrorResponse(
+                        new Date().toString(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        RMConstant.TYPE_BAD_REQUEST));
             }
         }
         return types;
@@ -73,7 +74,6 @@ public class TypeService {
         if (typeRepository.existsById(id)) {
             if (searchTypeByType(type.getType())!=null){
                 Type typeCheck = searchTypeByType(type.getType());
-                System.out.println(typeCheck);
                 if(!typeCheck.getId().equals(id)){
                     throw new RMValidateException(new ErrorResponse(
                             new Date().toString(),
@@ -86,7 +86,7 @@ public class TypeService {
             typeToUpdate.setId(id);
             typeToUpdate.setType(type.getType());
             typeRepository.save(typeToUpdate);
-            return TypeMapper.typeToTypeDTOMapper(typeToUpdate);
+            return TypeMapper.typesToTypeDTOsMapper(typeToUpdate);
         }
         throw new RMValidateException(new ErrorResponse(
                 new Date().toString(),

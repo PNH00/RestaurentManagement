@@ -33,4 +33,6 @@ public class Bill {
     private PaymentStatus paymentStatus;
     @Column(nullable = false,name = "create_date")
     private Date createDate;
+    @Column(nullable = false,name = "details")
+    private String details;
 }
